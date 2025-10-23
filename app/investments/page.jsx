@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 
-// ================= Investment Page with Flutterwave + NOWPayments =================
+// ================= Investment Page (NOWPayments Only) =================
 export default function InvestmentsPage() {
   const [form, setForm] = useState({ plan: "", amount: "" });
   const [modalOpen, setModalOpen] = useState(false);
@@ -65,10 +65,8 @@ export default function InvestmentsPage() {
   );
 }
 
-// ================= Payment Modal =================
+// ================= Payment Modal (NOWPayments Only) =================
 function PaymentModal({ plan, amount, onClose }) {
-  const [method, setMethod] = useState("flutterwave");
-
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50 p-4">
       <div className="relative bg-white p-6 rounded-2xl shadow-2xl w-full max-w-md space-y-6">
@@ -84,33 +82,10 @@ function PaymentModal({ plan, amount, onClose }) {
         </div>
 
         <h2 className="text-2xl font-bold text-center text-gray-900 mt-12">
-          Choose Payment Method
+          Pay with Crypto
         </h2>
 
-        <div className="flex justify-center gap-3">
-          <button
-            onClick={() => setMethod("flutterwave")}
-            className={`px-4 py-2 rounded-xl font-medium ${
-              method === "flutterwave" ? "bg-blue-600 text-white" : "bg-gray-200"
-            }`}
-          >
-            Card / Bank
-          </button>
-          <button
-            onClick={() => setMethod("crypto")}
-            className={`px-4 py-2 rounded-xl font-medium ${
-              method === "crypto" ? "bg-green-600 text-white" : "bg-gray-200"
-            }`}
-          >
-            Crypto
-          </button>
-        </div>
-
-        {method === "flutterwave" ? (
-          <FlutterwavePay amount={amount} onClose={onClose} />
-        ) : (
-          <NowPaymentsPay amount={amount} onClose={onClose} />
-        )}
+        <NowPaymentsPay amount={amount} onClose={onClose} />
       </div>
     </div>
   );
@@ -129,77 +104,6 @@ async function savePaymentToBackend(paymentData) {
   } catch (err) {
     console.error("Error saving payment:", err);
   }
-}
-
-// ================= Flutterwave Card/Bank Payment =================
-function FlutterwavePay({ amount, onClose }) {
-  const handleFlutterwavePay = () => {
-    const publicKey = process.env.NEXT_PUBLIC_FLUTTERWAVE_PUBLIC_KEY;
-
-    if (!publicKey) {
-      alert("⚠️ Flutterwave public key missing in .env.local");
-      return;
-    }
-
-    // Load Flutterwave inline SDK
-    const script = document.createElement("script");
-    script.src = "https://checkout.flutterwave.com/v3.js";
-    script.onload = () => {
-      window.FlutterwaveCheckout({
-        public_key: publicKey,
-        tx_ref: Date.now(),
-        amount: amount,
-        currency: "NGN",
-        payment_options: "card, banktransfer, ussd",
-        customer: {
-          email: "user@example.com",
-          name: "Investor",
-        },
-        customizations: {
-          title: "Investment Payment",
-          description: "Secure payment for your investment",
-          logo: "/logo.png",
-        },
-        callback: async function (response) {
-          console.log(response);
-          alert("✅ Payment successful!");
-
-          // Save to backend
-          await savePaymentToBackend({
-            user_id: 1, // replace with logged-in user ID later
-            amount: amount,
-            currency: "NGN",
-            status: "success",
-            reference: response.tx_ref,
-            gateway: "flutterwave",
-          });
-
-          onClose();
-        },
-        onclose: function () {
-          console.log("Payment modal closed");
-        },
-      });
-    };
-    document.body.appendChild(script);
-  };
-
-  return (
-    <div className="flex flex-col items-center gap-3 mt-4">
-      <button
-        onClick={handleFlutterwavePay}
-        className="bg-blue-600 text-white py-3 px-6 rounded-lg font-bold hover:bg-blue-700 shadow-md w-full"
-      >
-        Pay with Card / Bank
-      </button>
-      <button
-        onClick={onClose}
-        className="bg-gray-300 text-gray-700 py-3 px-6 rounded-lg font-bold hover:bg-gray-400 shadow-md w-full"
-      >
-        Cancel
-      </button>
-    </div>
-  );
 }
 
 // ================= NOWPayments Crypto Payment =================

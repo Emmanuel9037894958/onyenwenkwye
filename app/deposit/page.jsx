@@ -1,16 +1,14 @@
 "use client";
 import { useState } from "react";
-import { PaystackButton } from "react-paystack";
 import { FaBitcoin, FaGift, FaPaypal } from "react-icons/fa";
 import { useUser } from "@/app/referrals/context/UserContext";
 
 export default function DepositPage() {
   const { user } = useUser();
-  const publicKey = process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY;
-
-  const [email, setEmail] = useState(user?.email || ""); 
-  const [amount, setAmount] = useState(""); 
-  const [method, setMethod] = useState("paystack"); 
+  const [email, setEmail] = useState(user?.email || "");
+  const [amount, setAmount] = useState("");
+  const [method, setMethod] = useState("crypto");
+  const [loading, setLoading] = useState(false);
 
   if (!user) {
     return (
@@ -20,28 +18,45 @@ export default function DepositPage() {
     );
   }
 
-  const componentProps = {
-    email,
-    amount: Number(amount) * 100,
-    metadata: { custom_fields: [{ display_name: "Email", variable_name: "email", value: email }] },
-    publicKey,
-    text: "Pay Now",
-    onSuccess: async () => {
-      // Call your API to save deposit here
-      await fetch("/api/payments/deposit", {
+  const handleDeposit = async () => {
+    if (!amount || Number(amount) <= 0) {
+      alert("Please enter a valid amount.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      // 🔹 Replace with your actual backend endpoint that connects to NOWPayments API
+      const response = await fetch("https://your-backend-url.com/api/nowpayments/create-invoice", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ user: email, amount, method }),
+        body: JSON.stringify({
+          price_amount: amount,
+          price_currency: "usd",
+          pay_currency: "btc", // or "eth", "usdt", etc.
+          order_description: `Deposit by ${email}`,
+          user_email: email,
+        }),
       });
-      alert("Payment Successful and saved!");
-    },
-    onClose: () => alert("Payment cancelled."),
+
+      const data = await response.json();
+
+      if (data && data.invoice_url) {
+        window.location.href = data.invoice_url; // Redirect user to NOWPayments page
+      } else {
+        alert("Failed to create payment. Try again.");
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Error creating payment. Check your backend connection.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const paymentMethods = [
-    { key: "paystack", label: "Paystack", color: "green", icon: null },
+    { key: "crypto", label: "Crypto (NOWPayments)", color: "yellow", icon: <FaBitcoin className="inline mr-1" /> },
     { key: "paypal", label: "PayPal", color: "blue", icon: <FaPaypal className="inline mr-1" /> },
-    { key: "crypto", label: "Crypto", color: "yellow", icon: <FaBitcoin className="inline mr-1" /> },
     { key: "gift", label: "Gift Card", color: "pink", icon: <FaGift className="inline mr-1" /> },
   ];
 
@@ -53,13 +68,13 @@ export default function DepositPage() {
         {/* Amount */}
         <input
           type="number"
-          placeholder="Enter amount (NGN)"
+          placeholder="Enter amount (USD)"
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
           className="border rounded-lg p-3 mb-4 w-full"
         />
 
-        {/* Payment Method Selection */}
+        {/* Payment Method */}
         <div className="flex justify-between mb-4 space-x-2">
           {paymentMethods.map((pm) => (
             <button
@@ -74,12 +89,15 @@ export default function DepositPage() {
           ))}
         </div>
 
-        {/* Payment Processing */}
-        {method === "paystack" ? (
-          <PaystackButton
-            {...componentProps}
-            className="bg-green-600 text-white p-3 rounded-lg w-full font-semibold"
-          />
+        {/* Action Button */}
+        {method === "crypto" ? (
+          <button
+            onClick={handleDeposit}
+            disabled={loading}
+            className="bg-yellow-500 text-white p-3 rounded-lg w-full font-semibold disabled:opacity-50"
+          >
+            {loading ? "Processing..." : "Pay with NOWPayments"}
+          </button>
         ) : (
           <button
             className="bg-gray-600 text-white p-3 rounded-lg w-full font-semibold"
