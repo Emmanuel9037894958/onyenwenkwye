@@ -1,5 +1,5 @@
 "use client";
-
+// import LiveTicker from "@/components/LiveTicker";
 import { useEffect } from "react";
 
 export default function liveTracker() {

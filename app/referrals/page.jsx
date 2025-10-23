@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react";
 import { Gift, Share2, Users, DollarSign } from "lucide-react";
 // ✅ Make sure this path matches where your UserContext file really lives
-import { useUser } from "@/app/context/UserContext";
+import { useUser } from "@/referrals/context/UserContext";
+
 
 export default function RefilerPage() {
   const { user } = useUser(); // 🔑 access current logged-in user

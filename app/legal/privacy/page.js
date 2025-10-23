@@ -1,7 +1,7 @@
 "use client";
 
-import LiveTicker from "../components/LiveTicker";
-import TradingViewChart from "../components/TradingViewChart";
+import LiveTicker from "@/components/LiveTicker";
+import TradingViewChart from "@/components/TradingViewChart";
 
 export default function Dashboard() {
   return (
