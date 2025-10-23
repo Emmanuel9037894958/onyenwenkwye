@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { FaBitcoin, FaGift, FaPaypal } from "react-icons/fa";
-import { useUser } from "@/app/referrals/context/UserContext";
+import { useUser } from "@/app/context/UserContext";
 
 export default function DepositPage() {
   const { user } = useUser();

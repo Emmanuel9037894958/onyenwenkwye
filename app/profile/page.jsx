@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useUser } from "@/app/referrals/context/UserContext";
+import { useUser } from "@/app/context/UserContext";
 import { useRouter } from "next/navigation";
 
 export default function ProfilePage() {
