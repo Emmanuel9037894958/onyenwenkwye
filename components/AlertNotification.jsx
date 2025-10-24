@@ -3,25 +3,60 @@ import { useEffect, useState } from "react";
 
 export default function AlertNotification() {
   const names = [
-    "James", "Sophia", "Michael", "Emma", "William", "Olivia",
+    // 🇺🇸 USA
+      "Diego", "Camila", "Carlos", "Valentina", "Javier", "Elena",
+    "Santiago", "Lucía", "Goragy", "Isabel", "Maria", "Rafael",
+    "Carmen", "Luis", "Paula", "Juan", "Alejandro", "Cristina",
+
+    "James", "Sophia", "Michael", "Antonio", "William", "Olivia",
     "Benjamin", "Ava", "Lucas", "Isabella", "Ethan", "Mia",
-    "Alexander", "Charlotte", "Daniel", "Amelia", "Henry",
-    "Harper", "Matthew", "Evelyn",
+    "Alexander", "Charlotte", "Daniel", "Amelia", "Henry", "Harper",
+    "Matthew", "Evelyn", "Jack", "Ella", "Noah", "Scarlett",
+    "Elijah", "Grace", "Liam", "Lily", "Mason", "Aria",
+
+    // 🇮🇹 Italy
+    "Alessandro", "Giulia", "Lorenzo", "Chiara", "Matteo", "Sofia",
+    "Francesca", "Leonardo", "Martina", "Andrea", "Lucia", "Gabriele",
+    "Vittoria", "Marco", "Beatrice",
+
+    // 🇪🇸 Spain
+  
+  ];
+    const actions = [
+    "just deposited $5,000 into their investment account!",
+    "withdrew $1,200 profit — smooth and easy!",
+    "started trading with $3,500 in Forex markets!",
+    "invested $7,800 into a new energy portfolio!",
+    "just made a profit of $900 in less than an hour!",
+    "joined the platform with a $4,000 start — welcome aboard!",
+    "is actively trading with over $10,000 in assets!",
+    "just opened a verified investment account!",
+    "made a successful withdrawal of $5,300 — no delays!",
+    "is making big investment moves today!",
+    "upgraded to a premium investor plan!",
+    "just referred a new investor and earned a $250 bonus!",
+    "secured a 12% return on their last trade!",
+    "diversified their portfolio into crypto and stocks!",
+    "received a $1,000 performance bonus!",
+    "is climbing the leaderboard  top 10 traders this week!",
+    "just closed a winning trade on Bitcoin!",
+    "started a new position in the oil & gas market!",
+    "is exploring renewable energy investments!",
+    "earned a referral commission from a new signup!",
+    "completed KYC verification successfully!",
+    "hit a personal best profit of $2,700 today!",
+    "just subscribed to the advanced trading plan!",
+    "locked in profits from the US stock market!",
+    "secured a new investment contract  impressive!",
+    "made their first successful withdrawal  confidence boosted!",
+    "reached a new trading milestone  100 trades completed!",
+    "just deposited $2,500 to boost their portfolio value!",
+    "is now trading live on the global exchange!",
+    "cashed out profits from yesterday’s market rally!",
+    "just received instant payout confirmation!",
   ];
 
-  const actions = [
-    "just deposited $5,000!",
-    "withdrew $1,200!",
-    "started trading with $3,500!",
-    "invested $7,800!",
-    "made a profit of $900!",
-    "joined with $4,000!",
-    "is trading with $10,000!",
-    "just opened an account!",
-    "made a withdrawal of $5,300!",
-    "is making big moves!",
-  ];
-
+ 
   const countryAlerts = [
     "Someone from USA just deposited $5,000!",
     "A user from Nigeria withdrew $1,200!",
