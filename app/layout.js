@@ -2,13 +2,12 @@
 import Navbar from "@/components/Navbar";
 import { BarChart } from "lucide-react";
 import AlertNotification from "@/components/AlertNotification";
-import Script from "next/script"; // ✅ Import Script
 
+import "./globals.css";
 // ✅ Import both contexts
 import { UserProvider } from "@/app/context/UserContext";
 import { ClientProvider } from "@/app/context/ClientContext";
 
-import "./globals.css";
 
 export const metadata = {
   title: "Energy-Vest Platform",
@@ -22,11 +21,6 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <head>
-        {/* ✅ Use Next.js Script instead of normal script tag */}
-        <Script
-          src="https://cdn.tailwindcss.com"
-          strategy="beforeInteractive"
-        />
       </head>
 
       <body className="min-h-screen bg-gray-50 text-gray-900 relative">
@@ -34,7 +28,7 @@ export default function RootLayout({ children }) {
           <ClientProvider>
             <AlertNotification />
 
-            <header className="w-full flex items-center justify-center sm:justify-start bg-white shadow-md px-6 py-4">
+            <header className="w-full flex items-center justify-center sm:justify-start bg-white shadow-md">
               <BarChart className="w-8 h-8 text-orange-500 mr-2" />
               <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
                 Energy-Vest
@@ -42,7 +36,7 @@ export default function RootLayout({ children }) {
             </header>
 
             <Navbar />
-            <main className="pt-6 px-4 sm:px-6 lg:px-8">{children}</main>
+            <main className="pt-6">{children}</main>
           </ClientProvider>
         </UserProvider>
       </body>

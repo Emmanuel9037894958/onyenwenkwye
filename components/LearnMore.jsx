@@ -10,7 +10,6 @@ import {
   BarChart3,
   DollarSign,
   Globe,
-  Users,
 } from "lucide-react";
 import Invest from "./Invest";
 
@@ -18,55 +17,53 @@ import Invest from "./Invest";
 const cards = [
   {
     id: 1,
-    icon: <Info className="w-10 h-10 text-orange-500" />,
+    icon: <Info className="w-9 h-9 text-orange-500" />,
     title: "About Us",
     text: "Trusted investment platform focused on innovation and transparency.",
   },
   {
     id: 2,
-    icon: <Briefcase className="w-10 h-10 text-orange-500" />,
+    icon: <Briefcase className="w-9 h-9 text-orange-500" />,
     title: "Our Services",
     text: "From oil & gas to sustainable investments, we provide global solutions.",
   },
   {
     id: 3,
-    icon: <MessageSquare className="w-10 h-10 text-orange-500" />,
+    icon: <MessageSquare className="w-9 h-9 text-orange-500" />,
     title: "Get in Touch",
     text: "We are here to answer your questions and guide your investment journey.",
   },
   {
     id: 4,
-    icon: <TrendingUp className="w-10 h-10 text-orange-500" />,
+    icon: <TrendingUp className="w-9 h-9 text-orange-500" />,
     title: "Investment Plans",
     text: "Flexible plans designed to help you achieve financial freedom.",
   },
 ];
 
-// 🔹 Features Data
 const features = [
   {
-    icon: <ShieldCheck className="w-8 h-8 text-orange-500" />,
+    icon: <ShieldCheck className="w-7 h-7 text-orange-500" />,
     title: "Secure & Trusted",
     desc: "We prioritize security and transparency, ensuring your funds are always safe.",
   },
   {
-    icon: <BarChart3 className="w-8 h-8 text-orange-500" />,
+    icon: <BarChart3 className="w-7 h-7 text-orange-500" />,
     title: "Smart Analytics",
     desc: "Track investments in real-time with advanced analytics and reports.",
   },
   {
-    icon: <DollarSign className="w-8 h-8 text-orange-500" />,
+    icon: <DollarSign className="w-7 h-7 text-orange-500" />,
     title: "Profitable Growth",
     desc: "Get access to high-return opportunities backed by expert strategies.",
   },
   {
-    icon: <Globe className="w-8 h-8 text-orange-500" />,
+    icon: <Globe className="w-7 h-7 text-orange-500" />,
     title: "Global Reach",
     desc: "Invest across multiple industries and global markets with ease.",
   },
 ];
 
-// 🔹 Testimonials
 const testimonials = [
   {
     name: "Michael O.",
@@ -84,87 +81,68 @@ const testimonials = [
 
 function LearnMore() {
   return (
-    <div className="bg-gray-50 sm:px-10 md:px-20 py-16">
+    <div className="bg-gray-50 px-2 sm:px-4 md:px-10 lg:px-16 py-6 sm:py-10 md:py-14 space-y-10 sm:space-y-14 md:space-y-16 w-full">
       {/* 🔹 Heading */}
-      <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-800 text-center">
-        Learn More About{" "}
-        <span className="text-orange-500">Energy-vest</span>
-      </h2>
-      <p className="text-center mt-4 text-gray-600 max-w-2xl mx-auto text-lg">
-        At Energy-vest, we go beyond ordinary investment opportunities. 
-        We empower our clients with reliable, transparent, and global 
-        investment solutions designed to secure financial freedom.
-      </p>
+      <section className="text-center space-y-3 max-w-3xl mx-auto">
+        <h2 className="text-xl sm:text-3xl md:text-4xl font-bold text-gray-800">
+          Learn More About <span className="text-orange-500">Energy-vest</span>
+        </h2>
+        <p className="text-gray-600 text-sm sm:text-base md:text-lg leading-relaxed px-2">
+          At Energy-vest, we go beyond ordinary investment opportunities. We empower our clients with reliable, transparent, and global investment solutions designed to secure financial freedom.
+        </p>
+      </section>
 
       {/* 🔹 Cards Section */}
-      <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8 w-full">
         {cards.map((card) => (
           <div
             key={card.id}
-            className="flex flex-col items-center text-center border rounded-lg shadow-md p-6 bg-white transition-all hover:shadow-lg hover:shadow-orange-500/40"
+            className="flex flex-col items-center text-center border rounded-lg shadow-sm p-4 sm:p-5 bg-white hover:shadow-lg hover:shadow-orange-500/40 transition-all w-full"
           >
             {card.icon}
-            <h3 className="mt-4 text-lg font-semibold text-gray-800">
-              {card.title}
-            </h3>
-            <p className="mt-2 text-gray-600 text-sm">{card.text}</p>
+            <h3 className="mt-3 text-base sm:text-lg font-semibold text-gray-800">{card.title}</h3>
+            <p className="mt-2 text-gray-600 text-sm leading-relaxed">{card.text}</p>
           </div>
         ))}
-      </div>
+      </section>
 
       {/* 🔹 Trust Section */}
-      <div className="bg-gray-50 px-6 sm:px-10 md:px-20 py-16">
-        <div className="max-w-5xl mx-auto text-center md:text-left">
-          <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800 leading-snug">
-            TRUST, <span className="text-orange-500">Security</span>, 
-            Prosperity, Insight, Success.
-          </h3>
-          <p className="mt-6 text-gray-700 text-base sm:text-lg md:text-xl text-justify">
-            We are a global financial institution specializing in diversified investment 
-            activities across both traditional financial markets and the rapidly evolving 
-            digital asset space. Our operations are powered by a team of highly skilled 
-            professional traders with deep expertise in equities, commodities, foreign 
-            exchange, and cryptocurrency exchanges — delivering reliable strategies 
-            designed for long-term growth and stability.
-          </p>
+      <section className="bg-white rounded-xl shadow-sm p-4 sm:p-6 md:p-8 w-full">
+        <h3 className="text-lg sm:text-2xl md:text-3xl font-bold text-gray-800 text-center md:text-left leading-snug">
+          TRUST, <span className="text-orange-500">Security</span>, Prosperity, Insight, Success.
+        </h3>
+        <p className="mt-4 text-gray-700 text-sm sm:text-base md:text-lg text-justify">
+          We are a global financial institution specializing in diversified investment activities across both traditional financial markets and the rapidly evolving digital asset space. Our operations are powered by a team of highly skilled professional traders with deep expertise in equities, commodities, foreign exchange, and cryptocurrency exchanges — delivering reliable strategies designed for long-term growth and stability.
+        </p>
+        <div className="mt-6 flex justify-center md:justify-start">
+          <button className="flex items-center gap-2 bg-black text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium hover:bg-orange-500 hover:shadow-md transition-all">
+            Learn More <ArrowRight className="w-4 h-4" />
+          </button>
         </div>
-        <button
-          className="flex items-center justify-center gap-2 bg-black text-white 
-             rounded-lg h-12 w-44 font-medium shadow-md 
-             hover:bg-orange-500 hover:shadow-lg hover:shadow-orange-400/50 
-             transition-all duration-300 ease-in-out mt-6 mx-auto md:mx-0"
-        >
-          Learn More <ArrowRight className="w-5 h-5" />
-        </button>
-      </div>
+      </section>
 
       {/* 🔹 Features Section */}
-      <div className="py-16">
-        <h3 className="text-3xl font-bold text-center text-gray-800">
+      <section className="w-full">
+        <h3 className="text-xl sm:text-3xl font-bold text-center text-gray-800">
           Why Choose <span className="text-orange-500">Us</span>
         </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mt-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8 mt-6 sm:mt-8">
           {features.map((feature, index) => (
             <div
               key={index}
-              className="border rounded-lg shadow-md bg-white p-6 flex flex-col items-center text-center hover:shadow-lg transition"
+              className="border rounded-lg shadow-sm bg-white p-4 sm:p-6 flex flex-col items-center text-center hover:shadow-md transition w-full"
             >
               {feature.icon}
-              <h4 className="mt-4 text-lg font-semibold text-gray-800">
-                {feature.title}
-              </h4>
-              <p className="mt-2 text-gray-600 text-sm">{feature.desc}</p>
+              <h4 className="mt-3 text-base sm:text-lg font-semibold text-gray-800">{feature.title}</h4>
+              <p className="mt-2 text-gray-600 text-sm leading-relaxed">{feature.desc}</p>
             </div>
           ))}
         </div>
-      </div>
+      </section>
 
       {/* 🔹 Video Section */}
-      <div className="max-w-4xl mx-auto mt-12">
-        <div
-          className="relative w-full overflow-hidden rounded-lg shadow-lg"
-          style={{ paddingTop: "56.25%" }}
-        >
+      <section className="max-w-3xl mx-auto w-full">
+        <div className="relative w-full overflow-hidden rounded-lg shadow-md" style={{ paddingTop: "56.25%" }}>
           <iframe
             className="absolute top-0 left-0 w-full h-full"
             src="https://www.youtube.com/embed/VIKJXdkwVgA"
@@ -174,38 +152,36 @@ function LearnMore() {
             title="Energy-vest Introduction"
           />
         </div>
-      </div>
+      </section>
 
       {/* 🔹 Testimonials Section */}
-      <div className="py-20">
-        <h3 className="text-3xl font-bold text-center text-gray-800">
+      <section className="w-full">
+        <h3 className="text-xl sm:text-3xl font-bold text-center text-gray-800">
           What Our Clients Say
         </h3>
-        <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="mt-6 sm:mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
           {testimonials.map((t, i) => (
             <div
               key={i}
-              className="border rounded-lg shadow-md bg-white p-6 text-center hover:shadow-lg transition"
+              className="border rounded-lg shadow-sm bg-white p-4 sm:p-5 text-center hover:shadow-md transition w-full"
             >
-              <p className="text-gray-600 italic">"{t.text}"</p>
-              <h4 className="mt-4 font-semibold text-gray-800">{t.name}</h4>
+              <p className="text-gray-600 italic text-sm sm:text-base">"{t.text}"</p>
+              <h4 className="mt-3 font-semibold text-gray-800 text-sm sm:text-base">{t.name}</h4>
             </div>
           ))}
         </div>
-      </div>
+      </section>
 
       {/* 🔹 CTA Section */}
-      <div className="bg-orange-500 py-12 px-6 text-center rounded-2xl text-white">
-        <h3 className="text-3xl sm:text-4xl font-bold">
-          Ready to Secure Your Financial Future?
-        </h3>
-        <p className="mt-4 text-lg">
+      <section className="bg-orange-500 py-8 sm:py-10 px-3 sm:px-6 rounded-2xl text-white text-center space-y-3 sm:space-y-4 w-full">
+        <h3 className="text-xl sm:text-3xl font-bold">Ready to Secure Your Financial Future?</h3>
+        <p className="text-sm sm:text-base md:text-lg">
           Join thousands of investors and start growing your wealth today.
         </p>
-        <button className="mt-6 bg-white text-orange-600 px-8 py-3 rounded-lg shadow hover:shadow-lg font-semibold">
+        <button className="bg-white text-orange-600 px-5 sm:px-8 py-2.5 sm:py-3 rounded-lg shadow-md hover:shadow-lg font-semibold">
           Get Started Now
         </button>
-      </div>
+      </section>
 
       {/* 🔹 Investment Plans Section */}
       <Invest />

@@ -2,12 +2,12 @@
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useClient } from "@/app/context/ClientContext";
-import { Bell, User, ChevronDown, BarChart } from "lucide-react";
+import { Bell, User, ChevronDown, BarChart, Moon, Sun } from "lucide-react";
 import { FlagIcon } from "react-flag-kit";
 import Link from "next/link";
 
 export default function Navbar() {
- const { client: user, logout } = useClient();
+  const { client: user, logout } = useClient();
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
 
@@ -15,11 +15,46 @@ export default function Navbar() {
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const [langMenuOpen, setLangMenuOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-
+  const [theme, setTheme] = useState("light"); // add theme state
   const [selectedLang, setSelectedLang] = useState({ code: "US", name: "English" });
 
   const profileRef = useRef(null);
   const langRef = useRef(null);
+
+  // --- Detect and handle system theme ---
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)");
+    if (prefersDark.matches) {
+      document.documentElement.classList.add("dark");
+      setTheme("dark");
+    } else {
+      // Force dark mode if system is light (as per your request)
+      document.documentElement.classList.add("dark");
+      setTheme("dark");
+    }
+
+    const listener = (e) => {
+      if (e.matches) {
+        document.documentElement.classList.add("dark");
+        setTheme("dark");
+      } else {
+        // Still stay dark
+        document.documentElement.classList.add("dark");
+        setTheme("dark");
+      }
+    };
+    prefersDark.addEventListener("change", listener);
+    return () => prefersDark.removeEventListener("change", listener);
+  }, []);
+
+  // --- Optional toggle button ---
+  const toggleTheme = () => {
+    const newTheme = theme === "dark" ? "light" : "dark";
+    setTheme(newTheme);
+    document.documentElement.classList.toggle("dark");
+  };
 
   const mainLinks = [
     { label: "Home", href: "/" },
@@ -76,8 +111,8 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="bg-white dark:bg-gray-900 fixed top-0 left-0 w-full z-50 border-b border-gray-200 dark:border-gray-700">
-      <div className="max-w-screen-xl mx-auto flex items-center justify-between px-4 sm:px-6 lg:px-8 py-3">
+    <nav className="bg-white dark:bg-gray-900 fixed top-0 left-0 w-full z-50 border-b border-gray-200 dark:border-gray-700 transition-colors">
+      <div className=" mx-auto flex items-center justify-between px-4 sm:px-6 lg:px-8 py-3">
         {/* Logo */}
         <Link href="/" className="flex items-center space-x-2">
           <BarChart className="w-10 h-9 text-blue-700" />
@@ -134,6 +169,19 @@ export default function Navbar() {
 
         {/* Right side */}
         <div className="flex items-center space-x-3">
+          {/* Theme toggle */}
+          <button
+            onClick={toggleTheme}
+            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+            title="Toggle theme"
+          >
+            {theme === "dark" ? (
+              <Sun className="w-5 h-5 text-yellow-400" />
+            ) : (
+              <Moon className="w-5 h-5 text-gray-700" />
+            )}
+          </button>
+
           {/* Language */}
           <div className="relative" ref={langRef}>
             <button
@@ -254,13 +302,13 @@ export default function Navbar() {
             animate={{ x: 0 }}
             exit={{ x: "-100%" }}
             transition={{ type: "tween", duration: 0.3 }}
-            className="fixed inset-y-0 left-0 w-72 shadow-lg z-40 lg:hidden p-4 overflow-y-auto backdrop-blur-lg bg-white/60"
+            className="fixed inset-y-0 left-0 w-72 shadow-lg z-40 lg:hidden p-4 overflow-y-auto backdrop-blur-lg bg-white/60 dark:bg-gray-900/80"
           >
             <button
               className="mb-6 text-gray-700 dark:text-gray-200 font-bold"
               onClick={() => setMobileOpen(false)}
             >
-              X 
+              X
             </button>
 
             {mainLinks.map((link) => (
@@ -268,7 +316,7 @@ export default function Navbar() {
                 key={link.label}
                 href={link.href}
                 onClick={() => setMobileOpen(false)}
-                className="block py-2 text-gray-900 dark:text-gray-100 font-bold border-b border-gray-200 dark:border-gray-700"
+                className="block py-2 text-orange-600 dark:text-gray-100 font-bold border-b border-gray-200 dark:border-gray-700"
               >
                 {link.label}
               </Link>

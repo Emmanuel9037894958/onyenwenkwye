@@ -15,8 +15,8 @@ export default function StatsSection() {
   const { ref, inView } = useInView({ triggerOnce: true, threshold: 0.3 });
 
   return (
-    <section className="py-16 bg-gray-50">
-      <div className="max-w-6xl mx-auto px-6 sm:px-10 mb-11">
+    <section className="py-10 bg-gray-50">
+      <div className=" mx-auto  mb-11">
         <div ref={ref} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 text-center">
           {stats.map((stat) => (
             <div key={stat.id} className="bg-white p-6 rounded-xl shadow-lg">

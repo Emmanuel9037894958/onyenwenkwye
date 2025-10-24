@@ -4,39 +4,54 @@ import CheckIcon from "./CheckIcon";
 
 function MiddleRange() {
   return (
-    <section className="p-6 grid md:grid-cols-2 gap-8 items-center">
-      {/* Text & Features */}
-      <div>
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900">
+    <section
+      className="
+        px-3 sm:px-6 md:px-10 lg:px-16 
+        py-8 sm:py-10 md:py-14 
+        grid grid-cols-1 md:grid-cols-2 
+        gap-6 sm:gap-8 md:gap-10 items-center
+      "
+    >
+      {/* ===== Left Section (Text & Features) ===== */}
+      <div className="space-y-4 sm:space-y-6">
+        <h1 className="text-xl sm:text-2xl md:text-4xl font-bold text-gray-900 leading-snug">
           Investment that is suitable for you
         </h1>
-        <p className="text-orange-500 text-lg sm:text-xl mt-2">
+
+        <p className="text-orange-500 text-sm sm:text-base md:text-lg font-medium">
           Your financial freedom is our success
         </p>
 
-        <div className="mt-6 space-y-3">
+        {/* Features List */}
+        <div className="mt-3 space-y-3 sm:space-y-4">
           {[
             "We are innovative: bringing future-driven solutions for modern investors.",
             "We are timely: delivering results when you need them most.",
             "We are reliable: trusted by clients across borders to safeguard and grow their wealth.",
           ].map((text, index) => (
-            <div key={index} className="flex gap-3 items-center">
-              <CheckIcon size={18} />
-              <h4 className="text-gray-800 font-medium text-sm sm:text-base">
+            <div
+              key={index}
+              className="flex items-start gap-2 sm:gap-3"
+            >
+              <CheckIcon size={16} className="flex-shrink-0 text-orange-500" />
+              <p className="text-gray-700 text-xs sm:text-sm md:text-base leading-relaxed">
                 {text}
-              </h4>
+              </p>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Video Section */}
-      <div className="relative rounded-2xl overflow-hidden shadow-xl">
+      {/* ===== Right Section (Video) ===== */}
+      <div className="relative rounded-lg overflow-hidden shadow-lg">
         {/* Overlay Text */}
         <h3
-          className="absolute top-6 sm:top-10 left-3 sm:left-5 
-                     text-sm sm:text-lg md:text-xl lg:text-2xl 
-                     font-bold text-white drop-shadow-md max-w-[80%]"
+          className="
+            absolute top-3 sm:top-6 left-2 sm:left-4 
+            text-white font-semibold 
+            text-xs sm:text-sm md:text-lg 
+            drop-shadow-lg max-w-[85%]
+          "
         >
           Financial freedom is our success.
         </h3>
@@ -48,7 +63,11 @@ function MiddleRange() {
           muted
           autoPlay
           playsInline
-          className="w-full h-[220px] sm:h-[320px] md:h-[420px] lg:h-[520px] object-cover"
+          className="
+            w-full 
+            h-[180px] sm:h-[260px] md:h-[340px] lg:h-[420px] 
+            object-cover
+          "
         >
           <source src="/woman.mp4" type="video/mp4" />
         </video>

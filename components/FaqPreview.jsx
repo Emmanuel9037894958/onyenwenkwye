@@ -44,14 +44,14 @@ export default function FaqPage() {
   };
 
   return (
-    <section className="min-h-screen bg-black text-white py-12 px-6 mt-14">
-      <div className="max-w-5xl mx-auto space-y-16">
+    <section className=" bg-black text-white py-12  ">
+      <div className=" space-y-16">
         {/* 🔹 Company Intro */}
-        <div className="text-center p-8 bg-gray-900 rounded-xl shadow-md transition-all duration-300 hover:shadow-[0_0_25px_rgba(249,115,22,0.7)]">
+        <div className="text-center bg-gray-900 rounded-xl shadow-md transition-all duration-300 hover:shadow-[0_0_25px_rgba(249,115,22,0.7)]">
           <h2 className="text-3xl sm:text-4xl font-bold text-orange-500 mb-4">
             Who We Are
           </h2>
-          <p className="text-gray-300 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-gray-300 p-0 text-sm px-1">
             We are an international financial company engaged in investment
             activities, which are related to trading on financial markets and
             cryptocurrency exchanges performed by qualified professional

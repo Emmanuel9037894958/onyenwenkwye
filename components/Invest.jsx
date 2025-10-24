@@ -74,7 +74,7 @@ function Invest() {
         {/* <div className="absolute inset-0 bg-black/60 -z-10"></div> */}
 
         {/* 🔹 Content */}
-        <div className="relative z-10 text-white text-center max-w-3xl mx-auto">
+        <div className="relative z-10 text-white max-w-3xl mx-auto">
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold">
             Invest on{" "}
             <span className="text-orange-400">Crypto Currency Trading</span>
@@ -138,14 +138,14 @@ function Invest() {
       </section>
 
       {/* 🔹 Separate last text (not styled by section above) */}
-      <div className="text-center mt-8 px-6 max-w-4xl mx-auto">
+      <div className=" mt-8">
   <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800">
     Energy-Vest offers Card to investors on the REAL ASSET FUND PLAN
   </h1>
-  <p className="mt-4 text-gray-600 text-sm sm:text-base md:text-lg leading-relaxed">
+  <p className="mt-4 text-gray-600 text-sm md:text-lg leading-relaxed">
     At <span className="font-semibold text-orange-500">Energy-Vest</span>, we believe 
     financial freedom should be accessible to everyone. That is why we created the 
-    <span className="font-semibold"> Energy-Vest Global Investor Card</span> — a secure 
+    <span className="font-semibold"> Energy-Vest Global Investor Card</span> a secure 
     and reliable way for our investors to enjoy their returns with ease.
   </p>
   <p className="mt-3 text-gray-600 text-sm sm:text-base md:text-lg leading-relaxed">
@@ -160,16 +160,16 @@ function Invest() {
     gives you the confidence to invest, spend, and grow your wealth globally.
   </p>
   <p className="mt-4 font-semibold text-orange-600 text-base sm:text-lg md:text-xl">
-    💳 Invest smart. Spend freely. Trust Energy-Vest.
+    💲 Invest smart. Spend freely. Trust Energy-Vest.
   </p>
 </div>
-<div className="mt-8 flex justify-center">
+<div className="mt-8">
   <Image
     src="/whatappImage.jpg"   // since it's inside /public
     alt="WhatsApp Contact"
-    width={500}               // required
+    width={700}               // required
     height={400}              // required
-    className="rounded-xl shadow-lg"
+    className="rounded-xl shadow-lg object-cover w-full mx-auto"
   />
 </div>
 <div>
