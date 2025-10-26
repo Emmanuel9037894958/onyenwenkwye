@@ -23,7 +23,7 @@ export default function RootLayout({ children }) {
       <head>
       </head>
 
-      <body className="min-h-screen bg-gray-50 text-gray-900 relative">
+      <body className=" bg-gray-50 text-gray-900 relative">
         <UserProvider>
           <ClientProvider>
             <AlertNotification />
