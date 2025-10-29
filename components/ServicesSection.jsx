@@ -124,7 +124,7 @@ export default function ServicesSection() {
                 {service.description}
               </p>
 
-              <Link href={service.link}>
+              <Link href="/about">
                 <button className="bg-orange-500 text-white font-semibold px-5 py-2 rounded-full hover:bg-orange-600 transition-all">
                   Learn More
                 </button>

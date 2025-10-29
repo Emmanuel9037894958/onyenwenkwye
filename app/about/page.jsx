@@ -1,8 +1,18 @@
+"use client";
 import Link from "next/link";
 import Image from "next/image";
 import Footer from "@/components/Footer";
+import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
 
 export default function About() {
+  const [isLoading, setIsloading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsloading(false), 3000);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <div className="w-full bg-white text-gray-800">
       {/* Hero Section */}
@@ -12,7 +22,7 @@ export default function About() {
           alt="investors hub"
           width={1920}
           height={1080}
-          className="w-full h-[40vh] sm:h-[50vh] lg:h-[65vh] object-cover rounded-b-2xl shadow-lg"
+          className="w-full h-[40vh] sm:h-[50vh] lg:h-[65vh] object-cover shadow-lg"
           priority
         />
         <div className="absolute inset-0 bg-black/40 flex items-center justify-center rounded-b-2xl">
@@ -23,9 +33,11 @@ export default function About() {
       </section>
 
       {/* Main Content */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-16">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-16">
+      
+
         {/* Intro */}
-        <section className="text-center space-y-6">
+        <section className="text-center">
           <p className="text-base sm:text-lg lg:text-xl text-gray-700 leading-relaxed max-w-4xl mx-auto">
             At <span className="font-semibold text-green-700">Energy-Vest</span>, we are redefining
             how people invest in the future. We merge financial intelligence with sustainability,
