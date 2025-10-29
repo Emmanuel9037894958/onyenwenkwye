@@ -1,12 +1,16 @@
 "use client";
+
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { auth } from "@/lib/firebase"; // ✅ Make sure you have firebase.js or firebaseConfig.js inside /lib
 
 export default function RegisterPage() {
   const router = useRouter();
   const [form, setForm] = useState({ fullName: "", email: "", password: "" });
   const [msg, setMsg] = useState("");
   const [success, setSuccess] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -15,32 +19,44 @@ export default function RegisterPage() {
     e.preventDefault();
     setMsg("");
     setSuccess(false);
+    setLoading(true);
 
     try {
-      const res = await fetch("https://myinvestment.great-site.net/api/register.php", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form), // ✅ fixed — send full form data
+      // ✅ Register user in Firebase
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        form.email,
+        form.password
+      );
+
+      // ✅ Save full name to Firebase profile
+      await updateProfile(userCredential.user, {
+        displayName: form.fullName,
       });
 
-      const data = await res.json();
+      setSuccess(true);
+      setMsg("🎉 Registration successful! Redirecting to login...");
+      setTimeout(() => router.push("/login"), 2000);
 
-      if (data.success) {
-        setSuccess(true);
-        setMsg("Registration successful! Redirecting to login...");
-        setTimeout(() => router.push("/login"), 2000); // redirect after 2 seconds
-        setForm({ fullName: "", email: "", password: "" });
-      } 
-      // ✅ Auto-redirect if email already exists
-      else if (data.message?.toLowerCase().includes("already")) {
-        setMsg("Email already registered. Redirecting to login...");
-        setTimeout(() => router.push("/login"), 2000);
-      } 
-      else {
-        setMsg(data.message || "Registration failed");
+      setForm({ fullName: "", email: "", password: "" });
+    } catch (error) {
+      console.error("Registration error:", error);
+      switch (error.code) {
+        case "auth/email-already-in-use":
+          setMsg("⚠️ Email already registered. Redirecting to login...");
+          setTimeout(() => router.push("/login"), 2000);
+          break;
+        case "auth/invalid-email":
+          setMsg("❌ Invalid email address.");
+          break;
+        case "auth/weak-password":
+          setMsg("❌ Password should be at least 6 characters.");
+          break;
+        default:
+          setMsg("❌ " + error.message);
       }
-    } catch (err) {
-      setMsg("Server error: " + err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -51,7 +67,9 @@ export default function RegisterPage() {
           Create Account
         </h1>
         <p className="text-center text-gray-500 mb-6">
-          Join <span className="text-orange-600 font-semibold">Energy-Vest</span> today!
+          Join{" "}
+          <span className="text-orange-600 font-semibold">EnergyVest</span>{" "}
+          today!
         </p>
 
         {msg && (
@@ -112,9 +130,10 @@ export default function RegisterPage() {
 
           <button
             type="submit"
-            className="w-full py-3 rounded-lg bg-orange-600 text-white font-semibold shadow-md hover:bg-orange-700 focus:ring-2 focus:ring-orange-300 transition-colors duration-300"
+            disabled={loading}
+            className="w-full py-3 rounded-lg bg-orange-600 text-white font-semibold shadow-md hover:bg-orange-700 focus:ring-2 focus:ring-orange-300 transition-colors duration-300 disabled:opacity-60"
           >
-            Register
+            {loading ? "Registering..." : "Register"}
           </button>
         </form>
 

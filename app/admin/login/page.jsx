@@ -2,69 +2,46 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "@/lib/firebase";
 import { Eye, EyeOff } from "lucide-react";
 
 export default function AdminLoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [visible, setVisible] = useState(false); // password visibility
+  const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const validate = () => {
-    if (!email.trim() || !password) {
-      setError("Please fill in all fields");
-      return false;
-    }
-    // basic email format check
-    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!re.test(email.trim())) {
-      setError("Please enter a valid email address");
-      return false;
-    }
-    setError("");
-    return true;
-  };
+  const ADMIN_EMAILS = ["admin@energyvest.com", "energyvest@gmail.com"];
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    if (!validate()) return;
-
     setLoading(true);
     setError("");
 
     try {
-      const res = await fetch(
-        "https://myinvestment.great-site.net/api/admin/admin_login.php",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include", // keeps PHP session cookie
-          body: JSON.stringify({ email: email.trim(), password }),
-        }
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email.trim(),
+        password
       );
+      const user = userCredential.user;
 
-      // If server returned non-JSON (HTML error), handle gracefully
-      const text = await res.text();
-      try {
-        const data = JSON.parse(text);
-        if (data.success) {
-          // success -> redirect to admin dashboard
-          router.push("/admin/dashboard");
-        } else {
-          setError(data.message || "Invalid credentials");
-        }
-      } catch {
-        // invalid JSON response (PHP warning, etc.)
-        console.error("Unexpected server response:", text);
-        setError("Server returned an unexpected response. Check server logs.");
+      if (!ADMIN_EMAILS.includes(user.email)) {
+        setError("You are not authorized to access the admin panel.");
+        setLoading(false);
+        return;
       }
+
+      localStorage.setItem("admin", JSON.stringify({ email: user.email }));
+      router.push("/admin/dashboard");
     } catch (err) {
-      console.error(err);
-      setError(
-        "Network error. Make sure server is running and CORS is configured."
-      );
+      console.error("Login error:", err.message);
+      if (err.code === "auth/invalid-credential") setError("Invalid email or password");
+      else if (err.code === "auth/user-not-found") setError("No account found with this email");
+      else setError(err.message);
     } finally {
       setLoading(false);
     }
@@ -72,7 +49,7 @@ export default function AdminLoginPage() {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black p-4">
-      <div className="w-full max-w-md bg-gray-900/60 border border-gray-700 rounded-2xl p-6 shadow-2xl">
+      <div className="w-full max-w-md bg-gray-900/70 border border-gray-700 rounded-2xl p-6 shadow-2xl backdrop-blur-sm">
         <h1 className="text-3xl font-bold text-center mb-4 text-green-400">
           Admin Login
         </h1>
@@ -87,11 +64,12 @@ export default function AdminLoginPage() {
           <div>
             <label className="block text-sm text-gray-300 mb-1">Email</label>
             <input
+              type="email"
+              placeholder="admin@energyvest.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              type="email"
-              placeholder="admin@example.com"
               className="w-full px-4 py-2 rounded-lg bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-green-400"
+              required
             />
           </div>
 
@@ -99,28 +77,21 @@ export default function AdminLoginPage() {
             <label className="block text-sm text-gray-300 mb-1">Password</label>
             <div className="relative">
               <input
+                type={visible ? "text" : "password"}
+                placeholder="Enter password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                type={visible ? "text" : "password"}
-                placeholder="Your password"
                 className="w-full pr-12 px-4 py-2 rounded-lg bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-green-400"
+                required
               />
               <button
                 type="button"
-                aria-label={visible ? "Hide password" : "Show password"}
-                onClick={() => setVisible((v) => !v)}
-                className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded text-gray-300 hover:text-white"
+                onClick={() => setVisible(!visible)}
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
               >
-                {visible ? (
-                  <EyeOff className="w-5 h-5" />
-                ) : (
-                  <Eye className="w-5 h-5" />
-                )}
+                {visible ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
               </button>
             </div>
-            <p className="text-xs text-gray-400 mt-1">
-              Tip: click the eye to toggle visibility
-            </p>
           </div>
 
           <button

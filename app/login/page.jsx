@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
+import { auth } from "@/lib/firebase"; // ✅ your Firebase config path
 import { useClient } from "@/app/context/ClientContext";
 
 export default function LoginPage() {
@@ -13,6 +15,23 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [postLogin, setPostLogin] = useState(false);
 
+  // ✅ Auto-login check (if already logged in)
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        const userData = {
+          uid: user.uid,
+          email: user.email,
+          fullName: user.displayName || "User",
+        };
+        setClient(userData);
+        localStorage.setItem("user", JSON.stringify(userData));
+        router.push("/dashboard"); // redirect to user dashboard
+      }
+    });
+    return () => unsubscribe();
+  }, [router, setClient]);
+
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
@@ -22,95 +41,123 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const res = await fetch("https://myinvestment.great-site.net/api/login.php", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-        credentials: "include", // ✅ required for PHP sessions
-      });
+      // ✅ Firebase authentication
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        form.email,
+        form.password
+      );
 
-      // Ensure PHP sends valid JSON
-      const text = await res.text();
+      const user = userCredential.user;
+      const userData = {
+        uid: user.uid,
+        email: user.email,
+        fullName: user.displayName || "User",
+      };
 
-      try {
-        const data = JSON.parse(text);
+      // ✅ Store globally and locally
+      setClient(userData);
+      localStorage.setItem("user", JSON.stringify(userData));
 
-        if (data.success) {
-          setClient(data.user);
-          localStorage.setItem("user", JSON.stringify(data.user));
-
-          setPostLogin(true);
-          setTimeout(() => {
-            if (data.user.role === "admin") router.push("/admin");
-            else router.push("/");
-          }, 3000);
-        } else {
-          setMsg(data.message || "Invalid credentials");
-        }
-      } catch {
-        console.error("Invalid JSON:", text);
-        setMsg("Server returned invalid response.");
+      setPostLogin(true);
+      setTimeout(() => router.push("/dashboard"), 2000);
+    } catch (error) {
+      console.error("Login error:", error);
+      switch (error.code) {
+        case "auth/user-not-found":
+          setMsg("❌ No account found with that email.");
+          break;
+        case "auth/wrong-password":
+          setMsg("⚠️ Incorrect password. Try again.");
+          break;
+        case "auth/invalid-email":
+          setMsg("❌ Invalid email format.");
+          break;
+        default:
+          setMsg("Error: " + error.message);
       }
-    } catch (err) {
-      console.error("Fetch error:", err);
-      setMsg("Network error, please try again.");
     } finally {
       setLoading(false);
     }
   };
 
-  // ✅ Loading screen after login
+  // ✅ Animated loading screen after successful login
   if (postLogin) {
     return (
-      <div className="flex items-center justify-center h-screen bg-gradient-to-br from-indigo-500 to-purple-600 text-white">
+      <div className="flex items-center justify-center h-screen bg-gradient-to-br from-green-500 to-emerald-600 text-white">
         <div className="flex flex-col items-center space-y-4">
-          <div className="w-16 h-16 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-xl font-semibold">Please hold on, initializing your account…</p>
+          <div className="w-14 h-14 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-lg font-semibold animate-pulse">
+            Logging you in… Please wait
+          </p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-100">
-      <div className="bg-white p-6 rounded-xl shadow w-96 space-y-4">
-        <h1 className="text-2xl font-bold mb-4 text-center text-gray-800">
-          Login
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-50 via-white to-orange-100">
+      <div className="w-full max-w-md px-8 py-10 bg-white rounded-2xl shadow-xl border border-orange-100">
+        <h1 className="text-3xl font-extrabold text-center text-gray-800 mb-2">
+          Welcome Back
         </h1>
+        <p className="text-center text-gray-500 mb-6">
+          Log in to{" "}
+          <span className="text-orange-600 font-semibold">EnergyVest</span>
+        </p>
 
-        {msg && <p className="text-red-500 text-center">{msg}</p>}
+        {msg && (
+          <p className="text-center text-red-600 font-medium mb-4 animate-pulse">
+            {msg}
+          </p>
+        )}
 
-        <form onSubmit={handleSubmit}>
-          <input
-            type="email"
-            name="email"
-            placeholder="Email"
-            value={form.email}
-            onChange={handleChange}
-            className="border p-2 mb-3 w-full rounded"
-            required
-          />
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            value={form.password}
-            onChange={handleChange}
-            className="border p-2 mb-3 w-full rounded"
-            required
-          />
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Email
+            </label>
+            <input
+              type="email"
+              name="email"
+              value={form.email}
+              onChange={handleChange}
+              required
+              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none transition"
+              placeholder="you@example.com"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Password
+            </label>
+            <input
+              type="password"
+              name="password"
+              value={form.password}
+              onChange={handleChange}
+              required
+              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none transition"
+              placeholder="••••••••"
+            />
+          </div>
+
           <button
             type="submit"
             disabled={loading}
-            className="bg-green-600 hover:bg-green-700 text-white w-full p-2 rounded disabled:opacity-50"
+            className="w-full py-3 rounded-lg bg-green-600 text-white font-semibold shadow-md hover:bg-green-700 focus:ring-2 focus:ring-green-300 transition-colors duration-300 disabled:opacity-60"
           >
-            {loading ? "Signing in…" : "Login"}
+            {loading ? "Signing in..." : "Login"}
           </button>
         </form>
 
-        <p className="text-center text-sm text-gray-600">
-          Don not have an account?{" "}
-          <a href="/register" className="text-blue-600 hover:underline">
+        <p className="text-center text-gray-600 mt-6">
+          Don’t have an account?{" "}
+          <a
+            href="/register"
+            className="text-orange-600 font-medium hover:underline hover:text-orange-700"
+          >
             Register here
           </a>
         </p>
