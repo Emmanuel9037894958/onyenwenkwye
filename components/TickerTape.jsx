@@ -2,17 +2,21 @@
 import { useEffect, useRef } from "react";
 
 export default function TickerTape() {
-  const container = useRef(null);
+  const containerRef = useRef(null);
 
   useEffect(() => {
-    if (!container.current) return;
+    const container = containerRef.current;
+    if (!container) return;
 
-    // Clear old widget/scripts
-    container.current.innerHTML = "";
+    // ✅ Clean container before injecting new script
+    container.innerHTML = "";
 
     const script = document.createElement("script");
-    script.src = "https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js";
+    script.src =
+      "https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js";
     script.async = true;
+
+    // ✅ Safer stringified configuration (TradingView expects JSON inside <script>)
     script.innerHTML = JSON.stringify({
       symbols: [
         { proName: "FOREXCOM:SPXUSD", title: "S&P 500" },
@@ -20,33 +24,33 @@ export default function TickerTape() {
         { proName: "FX_IDC:EURUSD", title: "EUR/USD" },
         { proName: "BITSTAMP:BTCUSD", title: "Bitcoin" },
         { proName: "BITSTAMP:ETHUSD", title: "Ethereum" },
+        { proName: "BINANCE:BNBUSDT", title: "BNB" }, // Added 6th symbol
       ],
       showSymbolLogo: true,
-      isTransparent: false,
+      colorTheme: "dark",
       displayMode: "adaptive",
-      colorTheme: "dark", // black background
+      isTransparent: false,
       locale: "en",
-      largeChartUrl: "",
     });
 
-    container.current.appendChild(script);
+    container.appendChild(script);
 
-    // Cleanup
+    // ✅ Cleanup on component unmount
     return () => {
-      if (container.current) container.current.innerHTML = "";
+      container.innerHTML = "";
     };
   }, []);
 
   return (
     <div
-      ref={container}
+      ref={containerRef}
       className="tradingview-widget-container"
       style={{
         width: "100%",
-        height: "80px",
-        borderRadius: "8px",
+        height: "60px", // 🔹 slightly shorter height for cleaner fit
         overflow: "hidden",
-        backgroundColor: "#000", // fallback black
+        borderRadius: "10px",
+        backgroundColor: "#000",
       }}
     />
   );

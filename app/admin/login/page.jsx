@@ -3,110 +3,182 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "@/lib/firebase";
-import { Eye, EyeOff } from "lucide-react";
+import { doc, getDoc } from "firebase/firestore";
+import { auth, db } from "@/lib/firebase"; // ✅ your real Firebase config
+
+// Lucide icons for nice visuals
+import { User, Lock, LogIn, AlertTriangle, CheckCircle, Loader2 } from "lucide-react";
 
 export default function AdminLoginPage() {
-  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [visible, setVisible] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-
-  const ADMIN_EMAILS = ["admin@energyvest.com", "energyvest@gmail.com"];
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setError("");
+    setLoading(true);
 
     try {
-      const userCredential = await signInWithEmailAndPassword(
-        auth,
-        email.trim(),
-        password
-      );
+      // 1️⃣ Sign in with Firebase
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
-      if (!ADMIN_EMAILS.includes(user.email)) {
-        setError("You are not authorized to access the admin panel.");
+      // 2️⃣ Get user document from Firestore
+      const docRef = doc(db, "users", user.uid);
+      const docSnap = await getDoc(docRef);
+
+      if (!docSnap.exists()) {
+        setError("No user record found in Firestore.");
         setLoading(false);
         return;
       }
 
-      localStorage.setItem("admin", JSON.stringify({ email: user.email }));
-      router.push("/admin/dashboard");
+      const userData = docSnap.data();
+
+      // 3️⃣ Check admin role
+      if (userData.role === "admin") {
+        setError("Success! Access granted. Redirecting...");
+        router.push("/admin/dashboard");
+      } else {
+        setError("You are not authorized to access the admin dashboard.");
+      }
     } catch (err) {
-      console.error("Login error:", err.message);
-      if (err.code === "auth/invalid-credential") setError("Invalid email or password");
-      else if (err.code === "auth/user-not-found") setError("No account found with this email");
-      else setError(err.message);
+      console.error("Admin login error:", err.message);
+      setError("Invalid email or password.");
     } finally {
       setLoading(false);
     }
   };
 
+  const ErrorDisplay = () => {
+    if (!error) return null;
+    const isSuccess = error.includes("Success");
+    const classes = isSuccess
+      ? "bg-green-800/40 text-green-300 border-green-700"
+      : "bg-red-800/40 text-red-300 border-red-700";
+    const Icon = isSuccess ? CheckCircle : AlertTriangle;
+
+    return (
+      <div
+        className={`p-3 rounded-lg border flex items-start space-x-2 mb-6 
+        ${classes} transition-opacity duration-300 shadow-md`}
+      >
+        <Icon className="w-5 h-5 flex-shrink-0 mt-0.5" />
+        <p className="text-sm font-medium leading-relaxed">{error}</p>
+      </div>
+    );
+  };
+
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black p-4">
-      <div className="w-full max-w-md bg-gray-900/70 border border-gray-700 rounded-2xl p-6 shadow-2xl backdrop-blur-sm">
-        <h1 className="text-3xl font-bold text-center mb-4 text-green-400">
-          Admin Login
-        </h1>
+    <div
+      className="
+        flex items-center justify-center min-h-screen 
+        bg-gray-950 font-sans p-4
+        bg-[radial-gradient(ellipse_at_top_right,_var(--tw-color-gray-950)_0%,_var(--tw-color-indigo-900/10)_50%,_var(--tw-color-gray-950)_100%)]
+      "
+    >
+      <form
+        onSubmit={handleLogin}
+        className="
+          bg-gray-900/80 backdrop-blur-md shadow-[0_15px_60px_rgba(49,46,129,0.7)] 
+          rounded-2xl p-8 w-full max-w-md border border-indigo-700/30
+          transform transition-all duration-500 hover:shadow-[0_15px_80px_rgba(49,46,129,1)]
+        "
+      >
+        <div className="text-center mb-8">
+          <h2
+            className="
+            text-4xl font-extrabold text-transparent bg-clip-text 
+            bg-gradient-to-r from-indigo-300 to-purple-400 
+            tracking-tight mb-2
+          "
+          >
+            Admin Access
+          </h2>
+          <p className="text-gray-400 text-sm">Secure Access Required</p>
+        </div>
 
-        {error && (
-          <div className="mb-4 text-sm text-center text-red-300 bg-red-900/20 border border-red-700 rounded-md p-2">
-            {error}
-          </div>
-        )}
+        <ErrorDisplay />
 
-        <form onSubmit={handleLogin} className="space-y-4">
-          <div>
-            <label className="block text-sm text-gray-300 mb-1">Email</label>
+        {/* Email Field */}
+        <div className="mb-5 relative">
+          <label className="text-sm font-medium text-gray-300 block mb-2">Email</label>
+          <div className="relative">
+            <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-indigo-400/70" />
             <input
               type="email"
-              placeholder="admin@energyvest.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-2 rounded-lg bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-green-400"
               required
+              placeholder="admin@example.com"
+              className="
+                w-full pl-11 pr-4 py-3 border-none rounded-xl mt-1 
+                bg-gray-800 text-white placeholder-gray-500
+                focus:outline-none focus:ring-4 focus:ring-indigo-500/50 focus:bg-gray-700
+                transition duration-300 shadow-inner shadow-gray-900
+              "
+              disabled={loading}
             />
           </div>
-
-          <div>
-            <label className="block text-sm text-gray-300 mb-1">Password</label>
-            <div className="relative">
-              <input
-                type={visible ? "text" : "password"}
-                placeholder="Enter password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full pr-12 px-4 py-2 rounded-lg bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-green-400"
-                required
-              />
-              <button
-                type="button"
-                onClick={() => setVisible(!visible)}
-                className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
-              >
-                {visible ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-              </button>
-            </div>
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-3 rounded-lg bg-green-600 hover:bg-green-500 text-white font-semibold transition disabled:opacity-60"
-          >
-            {loading ? "Logging in..." : "Login"}
-          </button>
-        </form>
-
-        <div className="mt-6 text-center text-sm text-gray-400">
-          © {new Date().getFullYear()} EnergyVest Admin Panel
         </div>
-      </div>
+
+        {/* Password Field */}
+        <div className="mb-8 relative">
+          <label className="text-sm font-medium text-gray-300 block mb-2">Password</label>
+          <div className="relative">
+            <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-indigo-400/70" />
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              placeholder="Enter password"
+              className="
+                w-full pl-11 pr-4 py-3 border-none rounded-xl mt-1 
+                bg-gray-800 text-white placeholder-gray-500
+                focus:outline-none focus:ring-4 focus:ring-indigo-500/50 focus:bg-gray-700
+                transition duration-300 shadow-inner shadow-gray-900
+              "
+              disabled={loading}
+            />
+          </div>
+        </div>
+
+        {/* Submit Button */}
+        <button
+          type="submit"
+          disabled={loading}
+          className="
+            w-full flex items-center justify-center space-x-2 
+            bg-gradient-to-r from-indigo-600 to-purple-600 
+            text-white font-bold py-3 rounded-xl 
+            shadow-xl shadow-indigo-500/20
+            hover:shadow-2xl hover:shadow-indigo-500/40 
+            hover:from-indigo-700 hover:to-purple-700
+            active:scale-[0.98] transition-all duration-300
+            disabled:opacity-60 disabled:cursor-not-allowed
+          "
+        >
+          {loading ? (
+            <>
+              <Loader2 className="w-5 h-5 animate-spin" />
+              <span>Authenticating...</span>
+            </>
+          ) : (
+            <>
+              <LogIn className="w-5 h-5" />
+              <span>Sign In Securely</span>
+            </>
+          )}
+        </button>
+
+        <p className="text-center text-gray-500 text-xs mt-6">
+          © 2025 EnergyVest Admin Panel | Data integrity secured.
+        </p>
+      </form>
     </div>
   );
 }
