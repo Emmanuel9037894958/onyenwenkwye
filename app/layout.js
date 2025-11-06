@@ -1,13 +1,11 @@
-
 import Navbar from "@/components/Navbar";
 import { BarChart } from "lucide-react";
 import AlertNotification from "@/components/AlertNotification";
+import Script from "next/script"; // ✅ import this
 
 import "./globals.css";
-// ✅ Import both contexts
 import { UserProvider } from "@/app/context/UserContext";
 import { ClientProvider } from "@/app/context/ClientContext";
-
 
 export const metadata = {
   title: "Energy-Vest Platform",
@@ -20,8 +18,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <head>
-      </head>
+      <head></head>
 
       <body className="bg-gray-50 text-gray-900 relative">
         <UserProvider>
@@ -39,6 +36,21 @@ export default function RootLayout({ children }) {
             <main className="pt-6">{children}</main>
           </ClientProvider>
         </UserProvider>
+
+        {/* ✅ Correct Tawk.to Script */}
+        <Script id="tawk-to" strategy="afterInteractive">
+          {`
+            var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+            (function(){
+              var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+              s1.async=true;
+              s1.src='https://embed.tawk.to/690cc1edd0d40e1958e8c1ba/1j9ctb2pj';
+              s1.charset='UTF-8';
+              s1.setAttribute('crossorigin','*');
+              s0.parentNode.insertBefore(s1,s0);
+            })();
+          `}
+        </Script>
       </body>
     </html>
   );

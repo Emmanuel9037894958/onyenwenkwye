@@ -1,5 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
+import { db } from "@/lib/firebase";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 
 // ================= Trade Page =================
 export default function TradePage() {
@@ -15,7 +17,7 @@ export default function TradePage() {
   const [email, setEmail] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
 
-  // 🔹 Simulate live price updates
+  // 🔹 Live price simulation
   useEffect(() => {
     const interval = setInterval(() => {
       setMarkets((prev) =>
@@ -43,7 +45,7 @@ export default function TradePage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Market Table */}
-        <div className="lg:col-span-2 bg-white shadow-md rounded-2xl overflow-x-auto p-6">
+        <div className="lg:col-span-2 bg-white shadow-lg rounded-2xl overflow-x-auto p-6">
           <h3 className="text-lg font-semibold mb-4 text-gray-700">
             Live Market Prices
           </h3>
@@ -89,7 +91,7 @@ export default function TradePage() {
         </div>
 
         {/* Trade Form */}
-        <div className="bg-white shadow-md rounded-2xl p-6">
+        <div className="bg-white shadow-lg rounded-2xl p-6">
           <h3 className="text-lg font-semibold mb-4 text-gray-700">
             Trade Panel
           </h3>
@@ -150,11 +152,9 @@ export default function TradePage() {
 
 // ================= Payment Modal =================
 function PaymentModal({ asset, amount, email, onClose }) {
-  const [method, setMethod] = useState("flutterwave");
-
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50 p-4">
-      <div className="relative bg-white p-6 rounded-2xl shadow-2xl w-full max-w-md space-y-6">
+      <div className="relative bg-white p-6 rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.4)] w-full max-w-md space-y-6">
         {/* Floating Summary */}
         <div className="absolute -top-20 left-1/2 transform -translate-x-1/2 bg-indigo-600 text-white rounded-xl shadow-lg p-4 w-72 text-center">
           <h3 className="text-lg font-semibold">Trade Summary</h3>
@@ -167,121 +167,17 @@ function PaymentModal({ asset, amount, email, onClose }) {
         </div>
 
         <h2 className="text-2xl font-bold text-center text-gray-900 mt-12">
-          Choose Payment Method
+          Pay with Crypto
         </h2>
 
-        <div className="flex justify-center gap-3">
-          <button
-            onClick={() => setMethod("flutterwave")}
-            className={`px-4 py-2 rounded-xl font-medium ${
-              method === "flutterwave" ? "bg-blue-600 text-white" : "bg-gray-200"
-            }`}
-          >
-            Card / Bank
-          </button>
-          <button
-            onClick={() => setMethod("crypto")}
-            className={`px-4 py-2 rounded-xl font-medium ${
-              method === "crypto" ? "bg-green-600 text-white" : "bg-gray-200"
-            }`}
-          >
-            Crypto
-          </button>
-        </div>
-
-        {method === "flutterwave" ? (
-          <FlutterwavePay amount={amount} email={email} asset={asset} onClose={onClose} />
-        ) : (
-          <NowPaymentsPay amount={amount} asset={asset} onClose={onClose} />
-        )}
+        <NowPaymentsPay amount={amount} asset={asset} email={email} onClose={onClose} />
       </div>
     </div>
   );
 }
 
-// ================= Helper: Save Payment to Backend =================
-async function savePaymentToBackend(paymentData) {
-  try {
-    const res = await fetch("http://localhost/investment_site/api/save_payment.php", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(paymentData),
-    });
-    const data = await res.json();
-    console.log("Backend save result:", data);
-  } catch (err) {
-    console.error("Error saving payment:", err);
-  }
-}
-
-// ================= Flutterwave Card/Bank Payment =================
-function FlutterwavePay({ amount, email, asset, onClose }) {
-  const handleFlutterwavePay = () => {
-    const publicKey = process.env.NEXT_PUBLIC_FLUTTERWAVE_PUBLIC_KEY;
-
-    if (!publicKey) {
-      alert("⚠️ Flutterwave public key missing in .env.local");
-      return;
-    }
-
-    const script = document.createElement("script");
-    script.src = "https://checkout.flutterwave.com/v3.js";
-    script.onload = () => {
-      window.FlutterwaveCheckout({
-        public_key: publicKey,
-        tx_ref: Date.now(),
-        amount: parseFloat(amount),
-        currency: "USD",
-        payment_options: "card, banktransfer, ussd",
-        customer: {
-          email: email,
-          name: "Trader",
-        },
-        customizations: {
-          title: "Trade Payment",
-          description: `Payment for ${asset.asset}`,
-          logo: "/logo.png",
-        },
-        callback: async function (response) {
-          alert("✅ Payment successful!");
-          await savePaymentToBackend({
-            user_id: 1,
-            amount: amount,
-            currency: "USD",
-            status: "success",
-            reference: response.tx_ref,
-            gateway: "flutterwave",
-          });
-          onClose();
-        },
-        onclose: function () {
-          console.log("Payment modal closed");
-        },
-      });
-    };
-    document.body.appendChild(script);
-  };
-
-  return (
-    <div className="flex flex-col items-center gap-3 mt-4">
-      <button
-        onClick={handleFlutterwavePay}
-        className="bg-blue-600 text-white py-3 px-6 rounded-lg font-bold hover:bg-blue-700 shadow-md w-full"
-      >
-        Pay with Card / Bank
-      </button>
-      <button
-        onClick={onClose}
-        className="bg-gray-300 text-gray-700 py-3 px-6 rounded-lg font-bold hover:bg-gray-400 shadow-md w-full"
-      >
-        Cancel
-      </button>
-    </div>
-  );
-}
-
-// ================= NOWPayments Crypto Payment =================
-function NowPaymentsPay({ amount, asset, onClose }) {
+// ================= NOWPayments + Firebase Save =================
+function NowPaymentsPay({ amount, asset, email, onClose }) {
   const handleNowPay = async () => {
     const apiKey = process.env.NEXT_PUBLIC_NOWPAYMENTS_API_KEY;
 
@@ -303,8 +199,8 @@ function NowPaymentsPay({ amount, asset, onClose }) {
           pay_currency: "btc",
           order_id: "TRADE-" + Date.now(),
           order_description: `Trade for ${asset.asset}`,
-          success_url: "http://localhost:3000/success",
-          cancel_url: "http://localhost:3000/trade",
+          success_url: "https://yourdomain.com/success",
+          cancel_url: "https://yourdomain.com/trade",
           is_fee_paid_by_user: true,
         }),
       });
@@ -313,15 +209,19 @@ function NowPaymentsPay({ amount, asset, onClose }) {
       console.log("NOWPayments Response:", data);
 
       if (data.invoice_url) {
-        alert("Redirecting to crypto payment...");
-        await savePaymentToBackend({
-          user_id: 1,
-          amount: amount,
+        // ✅ Save to Firebase
+        await addDoc(collection(db, "payments"), {
+          email,
+          asset: asset.asset,
+          amount,
           currency: "USD",
           status: "pending",
           reference: data.invoice_id || "crypto-" + Date.now(),
           gateway: "nowpayments",
+          createdAt: serverTimestamp(),
         });
+
+        alert("Redirecting to NOWPayments...");
         window.location.href = data.invoice_url;
       } else {
         alert("❌ Failed to create crypto invoice. Check API key or amount.");

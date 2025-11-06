@@ -140,11 +140,11 @@ export default function Footer() {
           <ul className="space-y-3 text-sm sm:text-base">
             <li className="flex items-center space-x-2">
               <Mail className="w-4 h-4 text-blue-400" />
-              <span>support@energyvest.com</span>
+              <span>energyvest18@gmail.com</span>
             </li>
             <li className="flex items-center space-x-2">
               <Phone className="w-4 h-4 text-blue-400" />
-              <span>+1 234 567 890</span>
+              <span>+1 (873) 900-4468</span>
             </li>
             <li className="flex items-center space-x-2">
               <MapPin className="w-4 h-4 text-blue-400" />

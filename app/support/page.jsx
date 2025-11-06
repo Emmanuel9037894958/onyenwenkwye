@@ -70,11 +70,11 @@ export default function SupportPage() {
         <div className="flex flex-col sm:flex-row items-center justify-center gap-8 text-gray-700">
           <div className="flex items-center gap-3">
             <Mail className="w-6 h-6 text-orange-500" />
-            <span className="font-medium">support@energyvest.com</span>
+            <span className="font-medium"><a href="mailto:energyvest18@gmail.com">energyvest18@gmail.com</a></span>
           </div>
           <div className="flex items-center gap-3">
             <Phone className="w-6 h-6 text-green-600" />
-            <span className="font-medium">+234 800 123 4567</span>
+            <span className="font-medium"><a href="tel:+1 (873) 900-4468">+1 (873) 900-4468</a></span>
           </div>
         </div>
 
