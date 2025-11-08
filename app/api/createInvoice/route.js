@@ -3,7 +3,7 @@ export async function POST(req) {
     const body = await req.json();
     const { amount, currency = "usd" } = body;
 
-    const API_KEY = process.env.NOWPAYMENTS_API_KEY; // PRIVATE key, no NEXT_PUBLIC_
+    const API_KEY = process.env.NOWPAYMENTS_API_KEY;
 
     if (!API_KEY) {
       return new Response(JSON.stringify({ error: "NOWPayments API key not set" }), { status: 500 });
@@ -28,9 +28,16 @@ export async function POST(req) {
     });
 
     const data = await response.json();
+
+    // 🧩 Add this check:
+    if (!response.ok) {
+      console.error("NOWPayments API error:", data);
+      return new Response(JSON.stringify({ error: data }), { status: 500 });
+    }
+
     return new Response(JSON.stringify(data), { status: 200 });
   } catch (error) {
-    console.error(error);
-    return new Response(JSON.stringify({ error: "Failed to create invoice" }), { status: 500 });
+    console.error("Server error:", error);
+    return new Response(JSON.stringify({ error: error.message || "Failed to create invoice" }), { status: 500 });
   }
 }

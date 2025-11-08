@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 import { db } from "@/lib/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 
-// ================= Trade Page =================
 export default function TradePage() {
   const [markets, setMarkets] = useState([
     { id: 1, asset: "Crude Oil", price: 84.32, change: +0.8 },
@@ -17,13 +16,13 @@ export default function TradePage() {
   const [email, setEmail] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
 
-  // 🔹 Live price simulation
+  // 🔹 Simulate live market price changes
   useEffect(() => {
     const interval = setInterval(() => {
       setMarkets((prev) =>
         prev.map((m) => ({
           ...m,
-          price: (parseFloat(m.price) + ((Math.random() - 0.5) * 0.8)).toFixed(2),
+          price: (parseFloat(m.price) + (Math.random() - 0.5) * 0.8).toFixed(2),
           change: (Math.random() * 2 - 1).toFixed(2),
         }))
       );
@@ -63,7 +62,9 @@ export default function TradePage() {
                 <tr
                   key={m.id}
                   className={`border-t transition ${
-                    selectedAsset?.id === m.id ? "bg-blue-50" : "hover:bg-gray-50"
+                    selectedAsset?.id === m.id
+                      ? "bg-blue-50"
+                      : "hover:bg-gray-50"
                   }`}
                 >
                   <td className="p-3 font-medium">{m.asset}</td>
@@ -152,100 +153,80 @@ export default function TradePage() {
 
 // ================= Payment Modal =================
 function PaymentModal({ asset, amount, email, onClose }) {
+  const handleNowPay = async () => {
+    try {
+      const res = await fetch("/api/createInvoice", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          amount,
+          description: `Trade for ${asset.asset}`,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (data.invoice_url) {
+        await savePaymentToFirebase({
+          email,
+          asset: asset.asset,
+          amount,
+          status: "pending",
+          reference: data.invoice_id || "trade-" + Date.now(),
+          gateway: "nowpayments",
+        });
+
+        window.location.href = data.invoice_url;
+      } else {
+        alert("Error creating invoice: " + JSON.stringify(data));
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Payment failed");
+    }
+  };
+
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50 p-4">
-      <div className="relative bg-white p-6 rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.4)] w-full max-w-md space-y-6">
-        {/* Floating Summary */}
+      <div className="relative bg-white p-6 rounded-2xl shadow-lg w-full max-w-md space-y-6">
         <div className="absolute -top-20 left-1/2 transform -translate-x-1/2 bg-indigo-600 text-white rounded-xl shadow-lg p-4 w-72 text-center">
           <h3 className="text-lg font-semibold">Trade Summary</h3>
-          <p className="mt-1">
-            Asset: <span className="font-bold">{asset.asset}</span>
-          </p>
-          <p className="mt-1">
-            Amount: <span className="font-bold">${amount}</span>
-          </p>
+          <p className="mt-1">Asset: <span className="font-bold">{asset.asset}</span></p>
+          <p className="mt-1">Amount: <span className="font-bold">${amount}</span></p>
         </div>
 
         <h2 className="text-2xl font-bold text-center text-gray-900 mt-12">
-          Pay with Crypto
+          Pay with Crypto / USDT
         </h2>
 
-        <NowPaymentsPay amount={amount} asset={asset} email={email} onClose={onClose} />
+        <div className="flex flex-col items-center gap-3 mt-4">
+          <button
+            onClick={handleNowPay}
+            className="bg-gradient-to-r from-green-600 to-emerald-600 text-white py-3 px-6 rounded-lg font-bold hover:shadow-[0_0_25px_rgba(34,197,94,0.6)] transition-all duration-300 w-full"
+          >
+            Pay with Crypto
+          </button>
+          <button
+            onClick={onClose}
+            className="bg-gray-200 text-gray-800 py-3 px-6 rounded-lg font-bold hover:bg-gray-300 transition-all w-full"
+          >
+            Cancel
+          </button>
+        </div>
       </div>
     </div>
   );
 }
 
-// ================= NOWPayments + Firebase Save =================
-function NowPaymentsPay({ amount, asset, email, onClose }) {
-  const handleNowPay = async () => {
-    const apiKey = process.env.NEXT_PUBLIC_NOWPAYMENTS_API_KEY;
-
-    if (!apiKey) {
-      alert("⚠️ NOWPayments API key missing in .env.local");
-      return;
-    }
-
-    try {
-      const response = await fetch("https://api.nowpayments.io/v1/invoice", {
-        method: "POST",
-        headers: {
-          "x-api-key": apiKey,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          price_amount: parseFloat(amount),
-          price_currency: "usd",
-          pay_currency: "btc",
-          order_id: "TRADE-" + Date.now(),
-          order_description: `Trade for ${asset.asset}`,
-          success_url: "https://yourdomain.com/success",
-          cancel_url: "https://yourdomain.com/trade",
-          is_fee_paid_by_user: true,
-        }),
-      });
-
-      const data = await response.json();
-      console.log("NOWPayments Response:", data);
-
-      if (data.invoice_url) {
-        // ✅ Save to Firebase
-        await addDoc(collection(db, "payments"), {
-          email,
-          asset: asset.asset,
-          amount,
-          currency: "USD",
-          status: "pending",
-          reference: data.invoice_id || "crypto-" + Date.now(),
-          gateway: "nowpayments",
-          createdAt: serverTimestamp(),
-        });
-
-        alert("Redirecting to NOWPayments...");
-        window.location.href = data.invoice_url;
-      } else {
-        alert("❌ Failed to create crypto invoice. Check API key or amount.");
-      }
-    } catch (error) {
-      console.error(error);
-      alert("Error creating crypto payment");
-    }
-  };
-
-  return (
-    <div className="flex flex-col items-center gap-3 mt-4">
-      <button
-        onClick={handleNowPay}
-        className="bg-green-600 text-white py-3 px-6 rounded-lg font-bold hover:bg-green-700 shadow-md w-full"
-      >
-        Pay with Crypto
-      </button>
-      <button
-        onClick={onClose}
-        className="bg-gray-300 text-gray-700 py-3 px-6 rounded-lg font-bold hover:bg-gray-400 shadow-md w-full"
-      >
-        Cancel
-      </button>
-    </div>
-  );
+// ================= Save Payment to Firebase =================
+async function savePaymentToFirebase(paymentData) {
+  try {
+    const docRef = await addDoc(collection(db, "payments"), {
+      ...paymentData,
+      createdAt: serverTimestamp(),
+    });
+    console.log("✅ Payment saved with ID:", docRef.id);
+  } catch (error) {
+    console.error("❌ Error saving payment:", error);
+  }
 }
