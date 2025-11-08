@@ -292,55 +292,35 @@ async function savePaymentToFirebase(paymentData) {
   }
 }
 
-// ================= NOWPayments Integration =================
 function NowPaymentsPay({ amount, onClose }) {
   const handleNowPay = async () => {
-    const apiKey = process.env.NEXT_PUBLIC_NOWPAYMENTS_API_KEY;
-
-    if (!apiKey) {
-      alert("⚠️ NOWPayments API key missing in .env.local");
-      return;
-    }
-
     try {
-      const response = await fetch("https://api.nowpayments.io/v1/invoice", {
+      const res = await fetch("/api/createInvoice", {
         method: "POST",
-        headers: {
-          "x-api-key": apiKey,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          price_amount: amount,
-          price_currency: "usd",
-          pay_currency: "btc",
-          order_id: "INV-" + Date.now(),
-          order_description: "Investment payment",
-          success_url: "http://localhost:3000/success",
-          cancel_url: "http://localhost:3000/cancel",
-          is_fee_paid_by_user: true,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ amount }),
       });
 
-      const data = await response.json();
-      if (data.invoice_url) {
-        alert("Redirecting to crypto payment...");
+      const data = await res.json();
 
+      if (data.invoice_url) {
+        // Optional: save to Firebase before redirecting
         await savePaymentToFirebase({
           user_id: 1,
-          amount: amount,
+          amount,
           currency: "USD",
           status: "pending",
           reference: data.invoice_id || "crypto-" + Date.now(),
           gateway: "nowpayments",
         });
 
-        window.location.href = data.invoice_url;
+        window.location.href = data.invoice_url; // redirect client to invoice
       } else {
-        alert("Error creating crypto payment: " + JSON.stringify(data));
+        alert("Error creating invoice: " + JSON.stringify(data));
       }
-    } catch (error) {
-      console.error(error);
-      alert("Error creating crypto payment");
+    } catch (err) {
+      console.error(err);
+      alert("Payment failed");
     }
   };
 

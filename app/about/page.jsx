@@ -34,99 +34,199 @@ export default function About() {
 
       {/* Main Content */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-16">
-      
-
         {/* Intro */}
         <section className="text-center">
           <p className="text-base sm:text-lg lg:text-xl text-gray-700 leading-relaxed max-w-4xl mx-auto">
-            At <span className="font-semibold text-green-700">Energy-Vest</span>, we are redefining
-            how people invest in the future. We merge financial intelligence with sustainability,
-            empowering investors to build long-term wealth while accelerating innovation in renewable
+            At <span className="font-semibold text-green-700">Energy-Vest</span>
+            , we are redefining how people invest in the future. We merge
+            financial intelligence with sustainability, empowering investors to
+            build long-term wealth while accelerating innovation in renewable
             energy. Our mission:{" "}
             <strong className="text-green-800">
-              make smart investing accessible, transparent, and impactful for everyone.
+              make smart investing accessible, transparent, and impactful for
+              everyone.
             </strong>
           </p>
         </section>
 
         {/* Who We Are */}
         <section className="space-y-4">
-          <h2 className="text-2xl sm:text-3xl font-bold text-green-800">Who We Are</h2>
+          <h2 className="text-2xl sm:text-3xl font-bold text-green-800">
+            Who We Are
+          </h2>
           <p className="text-gray-700 leading-relaxed text-sm sm:text-base">
-            Energy-Vest was founded by a team of passionate financial experts, engineers, and
-            sustainability leaders who saw the need for a trusted, easy-to-use platform that combines
-            wealth growth with real-world impact. Our ecosystem is secure, regulated, and designed to
-            simplify investing for both beginners and professionals.
+            Energy-Vest was founded by a team of passionate financial experts,
+            engineers, and sustainability leaders who saw the need for a
+            trusted, easy-to-use platform that combines wealth growth with
+            real-world impact. Our ecosystem is secure, regulated, and designed
+            to simplify investing for both beginners and professionals.
             <br />
             <br />
-            We provide cutting-edge tools, detailed analytics, and verified investment opportunities
-            backed by transparency and technology. With a growing network of global investors,
-            Energy-Vest stands as a symbol of empowerment and innovation.
+            We provide cutting-edge tools, detailed analytics, and verified
+            investment opportunities backed by transparency and technology. With
+            a growing network of global investors, Energy-Vest stands as a
+            symbol of empowerment and innovation.
           </p>
         </section>
 
-        {/* Vision */}
         <section className="space-y-4">
-          <h2 className="text-2xl sm:text-3xl font-bold text-green-800">Our Vision</h2>
+          <h2 className="text-2xl sm:text-3xl font-bold text-green-800">
+            Who We Are
+          </h2>
           <p className="text-gray-700 leading-relaxed text-sm sm:text-base">
-            We envision a world where financial success and sustainability go hand in hand.
-            As the global energy sector shifts toward renewable and eco-friendly solutions, our
-            mission is to connect everyday investors to opportunities that deliver both strong
-            returns and a healthier planet.
+            Energy-Vest was founded by a team of passionate financial experts,
+            engineers, and sustainability leaders who saw the need for a
+            trusted, easy-to-use platform that combines wealth growth with
+            real-world impact. Our ecosystem is secure, regulated, and designed
+            to simplify investing for both beginners and professionals.
             <br />
             <br />
-            Through technologies like AI forecasting, blockchain transparency, and energy-sector
-            analytics, we empower our community to invest smarter, faster, and more confidently.
+            <strong className="text-green-800">
+              EnergyVest has been a trusted name in oil, gas, and energy
+              investments since 2008 empowering investors with transparency,
+              innovation, and long-term growth.
+            </strong>
+          </p>
+
+          <div className="">
+            <p className="font-medium text-gray-700 mb-3">
+              Trusted by investors from around the world, including:
+            </p>
+
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="flex items-center gap-2">
+                <img
+                  src="https://flagcdn.com/w20/us.png"
+                  alt="United States"
+                  className="w-6 h-4 shadow"
+                />
+                <span>United States</span>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <img
+                  src="https://flagcdn.com/w20/gb.png"
+                  alt="United Kingdom"
+                  className="w-6 h-4 shadow"
+                />
+                <span>United Kingdom</span>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <img
+                  src="https://flagcdn.com/w20/ca.png"
+                  alt="Canada"
+                  className="w-6 h-4 shadow"
+                />
+                <span>Canada</span>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <img
+                  src="https://flagcdn.com/w20/de.png"
+                  alt="Germany"
+                  className="w-6 h-4 shadow"
+                />
+                <span>Germany</span>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <img
+                  src="https://flagcdn.com/w20/au.png"
+                  alt="Australia"
+                  className="w-6 h-4 shadow"
+                />
+                <span>Australia</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <img
+                  src="https://flagcdn.com/w20/ae.png"
+                  alt="United Arab Emirates"
+                  className="w-6 h-4 shadow"
+                />
+                <span>United Arab Emirates</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <img
+                  src="https://flagcdn.com/w20/ir.png"
+                  alt="Iran"
+                  className="w-6 h-4 shadow"
+                />
+                <span>Iran</span> and many more .
+              </div>
+            </div>
+          </div>
+
+          <p className="text-gray-700 leading-relaxed text-sm sm:text-base">
+            We provide cutting-edge tools, detailed analytics, and verified
+            investment opportunities backed by transparency and technology. With
+            a growing network of global investors, Energy-Vest stands as a
+            symbol of empowerment and innovation.
           </p>
         </section>
 
         {/* Why Choose Us */}
         <section className="space-y-4">
-          <h2 className="text-2xl sm:text-3xl font-bold text-green-800">Why Choose Energy-Vest</h2>
+          <h2 className="text-2xl sm:text-3xl font-bold text-green-800">
+            Why Choose Energy-Vest
+          </h2>
           <ul className="list-disc list-inside text-gray-700 text-sm sm:text-base space-y-2">
             <li>
-              <strong>Full Transparency:</strong> Real-time reporting and total portfolio control.
+              <strong>Full Transparency:</strong> Real-time reporting and total
+              portfolio control.
             </li>
             <li>
-              <strong>No Hidden Fees:</strong> No charges for deposits or withdrawals — your money stays yours.
+              <strong>No Hidden Fees:</strong> No charges for deposits or
+              withdrawals your money stays yours.
             </li>
             <li>
-              <strong>Bank-Grade Security:</strong> Multi-layer encryption and regulated systems.
+              <strong>Bank-Grade Security:</strong> Multi-layer encryption and
+              regulated systems.
             </li>
             <li>
-              <strong>Global Reach:</strong> Access worldwide investment opportunities across multiple sectors.
+              <strong>Global Reach:</strong> Access worldwide investment
+              opportunities across multiple sectors.
             </li>
             <li>
-              <strong>Smart Technology:</strong> AI-driven insights and predictive analytics for better investing.
+              <strong>Smart Technology:</strong> AI-driven insights and
+              predictive analytics for better investing.
             </li>
             <li>
-              <strong>Impact-Driven:</strong> Every investment supports sustainable, planet-friendly projects.
+              <strong>Impact-Driven:</strong> Every investment supports
+              sustainable, planet-friendly projects.
             </li>
           </ul>
         </section>
 
         {/* Core Values */}
         <section className="space-y-4">
-          <h2 className="text-2xl sm:text-3xl font-bold text-green-800">Our Core Values</h2>
+          <h2 className="text-2xl sm:text-3xl font-bold text-green-800">
+            Our Core Values
+          </h2>
           <p className="text-gray-700 leading-relaxed text-sm sm:text-base">
-            At Energy-Vest, we don’t just invest in markets — we invest in people and the planet.
-            Our core values define our purpose:
+            At Energy-Vest, we don’t just invest in markets — we invest in
+            people and the planet. Our core values define our purpose:
           </p>
           <ul className="list-disc list-inside text-gray-700 text-sm sm:text-base space-y-2">
             <li>
-              <strong>Integrity:</strong> Honesty, fairness, and trust guide our every move.
+              <strong>Integrity:</strong> Honesty, fairness, and trust guide our
+              every move.
             </li>
             <li>
-              <strong>Innovation:</strong> We evolve with technology to enhance user experience.
+              <strong>Innovation:</strong> We evolve with technology to enhance
+              user experience.
             </li>
             <li>
-              <strong>Sustainability:</strong> Eco-conscious projects that protect our world.
+              <strong>Sustainability:</strong> Eco-conscious projects that
+              protect our world.
             </li>
             <li>
-              <strong>Empowerment:</strong> Making financial growth simple and inclusive.
+              <strong>Empowerment:</strong> Making financial growth simple and
+              inclusive.
             </li>
             <li>
-              <strong>Excellence:</strong> We strive for exceptional service and outcomes.
+              <strong>Excellence:</strong> We strive for exceptional service and
+              outcomes.
             </li>
           </ul>
         </section>
@@ -137,14 +237,16 @@ export default function About() {
             Join Us on the Journey
           </h2>
           <p className="text-gray-700 text-sm sm:text-base max-w-3xl mx-auto leading-relaxed">
-            Energy-Vest isn’t just a platform — it’s a movement reshaping the future of investing.
-            We connect thousands of investors to high-potential projects that drive both profits
-            and positive change. Whether you’re a first-time investor or a seasoned trader,
-            we’ll guide you every step of the way.
+            Energy-Vest isn’t just a platform — it’s a movement reshaping the
+            future of investing. We connect thousands of investors to
+            high-potential projects that drive both profits and positive change.
+            Whether you’re a first-time investor or a seasoned trader, we’ll
+            guide you every step of the way.
             <br />
             <br />
             <span className="font-semibold">
-              Be part of a future where your investments create both profits and purpose.
+              Be part of a future where your investments create both profits and
+              purpose.
             </span>
           </p>
           <Link href="/register">

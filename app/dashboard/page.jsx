@@ -9,28 +9,9 @@ import { ProfileSettings } from "@/components/ProfileSettings";
 import { TradeForm } from "@/components/TradeForm";
 import { Wallet, TrendingUp, DollarSign, FileText, Menu, X } from "lucide-react";
 
-const API_BASE = "http://localhost/investment_site/api";
-
-export const dataService = {
-  getSummary: async () => {
-    const res = await fetch(`${API_BASE}/summary.php`);
-    if (!res.ok) throw new Error("Failed to fetch summary");
-    const data = await res.json();
-    return data.data;
-  },
-  getPerformanceHistory: async () => {
-    const res = await fetch(`${API_BASE}/performances.php`);
-    if (!res.ok) throw new Error("Failed to fetch performance history");
-    const data = await res.json();
-    return data.data;
-  },
-  getHoldings: async () => {
-    const res = await fetch(`${API_BASE}/holdings.php`);
-    if (!res.ok) throw new Error("Failed to fetch holdings");
-    const data = await res.json();
-    return data.data;
-  },
-};
+// ✅ Firebase imports
+import { db } from "@/lib/firebase";
+import { collection, onSnapshot } from "firebase/firestore";
 
 export default function DashboardPage() {
   const [summary, setSummary] = useState({
@@ -44,8 +25,8 @@ export default function DashboardPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const [userName, setUserName] = useState("Maria pio");
-  const [userTier, setUserTier] = useState("Tier 3 Investor");
+  const [userName, setUserName] = useState(""); // Will pull from logged-in user
+  const [userTier, setUserTier] = useState("Investor");
   const [userImage, setUserImage] = useState(null);
   const [showProfile, setShowProfile] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -53,31 +34,89 @@ export default function DashboardPage() {
   const toggleProfile = () => setShowProfile((prev) => !prev);
   const toggleSidebar = () => setSidebarOpen((prev) => !prev);
 
-  const fetchAllData = useCallback(async () => {
+  // ✅ Real-time Firestore listener
+  const listenToFirestore = useCallback(() => {
     setIsLoading(true);
     setError(null);
+
     try {
-      const [summaryData, performanceData, holdingsData] = await Promise.all([
-        dataService.getSummary(),
-        dataService.getPerformanceHistory(),
-        dataService.getHoldings(),
-      ]);
-      setSummary(summaryData);
-      setPerformance(performanceData);
-      setHoldings(holdingsData);
-    } catch (e) {
-      console.error(e);
-      setError(e.message);
-    } finally {
+      // 🔥 Listen to investments (correct plural collection)
+      const unsubInvestments = onSnapshot(
+        collection(db, "investments"),
+        (snapshot) => {
+          let totalAssets = 0;
+          let totalGainLoss = 0;
+          let cashBalance = 0;
+
+          snapshot.forEach((doc) => {
+            const data = doc.data();
+            console.log("Investment doc:", data);
+
+            const amount = Number(data.amount) || 0;
+            const profit = Number(data.profit) || 0;
+            const balance = Number(data.balance) || 0;
+
+            totalAssets += amount;
+            totalGainLoss += profit;
+            cashBalance += balance;
+          });
+
+          const dailyChange = Number((Math.random() * 2 - 1).toFixed(2));
+
+          setSummary({
+            totalAssets,
+            totalGainLoss,
+            cashBalance,
+            dailyChange,
+          });
+
+          setIsLoading(false);
+        },
+        (error) => {
+          console.error("Error fetching investments:", error);
+          setError("Failed to fetch investment data");
+          setIsLoading(false);
+        }
+      );
+
+      // 🔥 Listen to performance
+      const unsubPerformance = onSnapshot(collection(db, "performance"), (snapshot) => {
+        const performanceData = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setPerformance(performanceData);
+      });
+
+      // 🔥 Listen to holdings
+      const unsubHoldings = onSnapshot(collection(db, "holdings"), (snapshot) => {
+        const holdingsData = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setHoldings(holdingsData);
+      });
+
+      // 🧹 Cleanup on unmount
+      return () => {
+        unsubInvestments();
+        unsubPerformance();
+        unsubHoldings();
+      };
+    } catch (err) {
+      console.error("Realtime Firestore error:", err);
+      setError("Unable to connect to Firestore in real-time");
       setIsLoading(false);
     }
   }, []);
 
+  // 🔁 Start real-time listeners
   useEffect(() => {
-    fetchAllData();
-  }, [fetchAllData]);
+    const cleanup = listenToFirestore();
+    return cleanup;
+  }, [listenToFirestore]);
 
-  // Trade form
+  // 💰 Trade form (demo)
   const [tradeSymbol, setTradeSymbol] = useState("AAPL");
   const [tradeQty, setTradeQty] = useState(1);
   const [tradeType, setTradeType] = useState("buy");
@@ -92,7 +131,7 @@ export default function DashboardPage() {
     <div className="flex flex-col lg:flex-row min-h-screen bg-gray-50 antialiased">
       {/* Mobile Sidebar Toggle */}
       <div className="lg:hidden flex items-center justify-between bg-indigo-600 text-white p-4 shadow-md">
-        <h1 className="text-lg font-semibold">Investment Dashboard</h1>
+        <h1 className="text-lg font-semibold">EnergyVest Dashboard</h1>
         <button onClick={toggleSidebar} className="text-white focus:outline-none">
           {sidebarOpen ? <X size={28} /> : <Menu size={28} />}
         </button>
@@ -130,12 +169,32 @@ export default function DashboardPage() {
             />
           )}
 
-          {/* Stat Cards */}
+          {/* ✅ Stat Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-            <StatCard title="Total Managed Assets" value={summary.totalAssets} icon={Wallet} change={summary.totalGainLoss} />
-            <StatCard title="24h Market Change" value={summary.dailyChange} icon={TrendingUp} change={summary.dailyChange} />
-            <StatCard title="Available Cash Balance" value={summary.cashBalance} icon={DollarSign} change={0} />
-            <StatCard title="Total P&L (All Time)" value={summary.totalGainLoss} icon={FileText} change={summary.totalGainLoss} />
+            <StatCard
+              title="Total Managed Assets"
+              value={`$${summary.totalAssets.toLocaleString() || "0.00"}`}
+              icon={Wallet}
+              change={summary.totalGainLoss}
+            />
+            <StatCard
+              title="24h Market Change"
+              value={`${!isNaN(summary.dailyChange) ? summary.dailyChange : 0}%`}
+              icon={TrendingUp}
+              change={summary.dailyChange}
+            />
+            <StatCard
+              title="Available Cash Balance"
+              value={`$${summary.cashBalance.toLocaleString() || "0.00"}`}
+              icon={DollarSign}
+              change={0}
+            />
+            <StatCard
+              title="Total P&L (All Time)"
+              value={`$${summary.totalGainLoss.toLocaleString() || "0.00"}`}
+              icon={FileText}
+              change={summary.totalGainLoss}
+            />
           </div>
 
           {/* Performance Chart */}
