@@ -1,31 +1,63 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { Sidebar } from "@/components/Sidebar";
 import { Header } from "@/components/Header";
 import { StatCard } from "@/components/StatCard";
 import { PerformanceChart } from "@/components/PerformanceChart";
 import { ProfileSettings } from "@/components/ProfileSettings";
 import { TradeForm } from "@/components/TradeForm";
-import { Wallet, TrendingUp, DollarSign, FileText, Menu, X } from "lucide-react";
+import {
+  Wallet,
+  TrendingUp,
+  DollarSign,
+  FileText,
+  Menu,
+  X,
+} from "lucide-react";
 
-// ✅ Firebase imports
+// Firebase imports
 import { db } from "@/lib/firebase";
-import { collection, onSnapshot } from "firebase/firestore";
+import { doc, onSnapshot } from "firebase/firestore";
+
+// ---------------------------
+// Helper to safely parse numbers
+// ---------------------------
+const parseNumber = (val) => {
+  const num =
+    typeof val === "number"
+      ? val
+      : typeof val === "string"
+      ? parseFloat(val.replace(/[^0-9.-]+/g, ""))
+      : 0;
+  return isNaN(num) ? 0 : num;
+};
+
+// Default initial dashboard data (fallback)
+const initialDashboardData = {
+  totalManagedAssets: 0,
+  marketChange: 0,
+  availableCash: 0,
+  totalPnl: 0,
+};
 
 export default function DashboardPage() {
+  // ---------------------------
+  // Dashboard summary state
+  // ---------------------------
   const [summary, setSummary] = useState({
-    totalAssets: 0,
-    dailyChange: 0,
-    totalGainLoss: 0,
-    cashBalance: 0,
+    totalAssets: initialDashboardData.totalManagedAssets,
+    dailyChange: initialDashboardData.marketChange,
+    totalGainLoss: initialDashboardData.totalPnl,
+    cashBalance: initialDashboardData.availableCash,
   });
+
   const [performance, setPerformance] = useState([]);
   const [holdings, setHoldings] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const [userName, setUserName] = useState(""); // Will pull from logged-in user
+  const [userName, setUserName] = useState("Amamchukwu Emmanuel");
   const [userTier, setUserTier] = useState("Investor");
   const [userImage, setUserImage] = useState(null);
   const [showProfile, setShowProfile] = useState(false);
@@ -34,105 +66,78 @@ export default function DashboardPage() {
   const toggleProfile = () => setShowProfile((prev) => !prev);
   const toggleSidebar = () => setSidebarOpen((prev) => !prev);
 
-  // ✅ Real-time Firestore listener
-  const listenToFirestore = useCallback(() => {
+  // ---------------------------
+  // Firestore: Listen to dashboard summary
+  // ---------------------------
+  useEffect(() => {
     setIsLoading(true);
-    setError(null);
 
-    try {
-      // 🔥 Listen to investments (correct plural collection)
-      const unsubInvestments = onSnapshot(
-        collection(db, "investments"),
-        (snapshot) => {
-          let totalAssets = 0;
-          let totalGainLoss = 0;
-          let cashBalance = 0;
-
-          snapshot.forEach((doc) => {
-            const data = doc.data();
-            console.log("Investment doc:", data);
-
-            const amount = Number(data.amount) || 0;
-            const profit = Number(data.profit) || 0;
-            const balance = Number(data.balance) || 0;
-
-            totalAssets += amount;
-            totalGainLoss += profit;
-            cashBalance += balance;
-          });
-
-          const dailyChange = Number((Math.random() * 2 - 1).toFixed(2));
+    const docRef = doc(db, "dashboard", "main"); // Your Firestore dashboard doc path
+    const unsubscribe = onSnapshot(
+      docRef,
+      (docSnap) => {
+        if (docSnap.exists()) {
+          const data = docSnap.data();
 
           setSummary({
-            totalAssets,
-            totalGainLoss,
-            cashBalance,
-            dailyChange,
+            totalAssets: parseNumber(data.totalManagedAssets),
+            dailyChange: parseNumber(data.marketChange),
+            cashBalance: parseNumber(data.availableCash),
+            totalGainLoss: parseNumber(data.totalPnl),
           });
-
-          setIsLoading(false);
-        },
-        (error) => {
-          console.error("Error fetching investments:", error);
-          setError("Failed to fetch investment data");
-          setIsLoading(false);
+        } else {
+          console.warn("Dashboard document does not exist!");
+          setSummary(initialDashboardData);
         }
-      );
+        setIsLoading(false);
+      },
+      (err) => {
+        console.error("Error fetching dashboard summary:", err);
+        setError("Failed to fetch dashboard summary");
+        setIsLoading(false);
+      }
+    );
 
-      // 🔥 Listen to performance
-      const unsubPerformance = onSnapshot(collection(db, "performance"), (snapshot) => {
-        const performanceData = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setPerformance(performanceData);
-      });
-
-      // 🔥 Listen to holdings
-      const unsubHoldings = onSnapshot(collection(db, "holdings"), (snapshot) => {
-        const holdingsData = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setHoldings(holdingsData);
-      });
-
-      // 🧹 Cleanup on unmount
-      return () => {
-        unsubInvestments();
-        unsubPerformance();
-        unsubHoldings();
-      };
-    } catch (err) {
-      console.error("Realtime Firestore error:", err);
-      setError("Unable to connect to Firestore in real-time");
-      setIsLoading(false);
-    }
+    return () => unsubscribe();
   }, []);
 
-  // 🔁 Start real-time listeners
-  useEffect(() => {
-    const cleanup = listenToFirestore();
-    return cleanup;
-  }, [listenToFirestore]);
-
-  // 💰 Trade form (demo)
+  // ---------------------------
+  // Trade form state
+  // ---------------------------
   const [tradeSymbol, setTradeSymbol] = useState("AAPL");
   const [tradeQty, setTradeQty] = useState(1);
   const [tradeType, setTradeType] = useState("buy");
 
   const handlePlaceOrder = () => {
     if (tradeQty <= 0) return alert("Quantity must be positive");
-    alert(`Order executed: ${tradeType.toUpperCase()} ${tradeQty} shares of ${tradeSymbol}`);
+    alert(
+      `Order executed: ${tradeType.toUpperCase()} ${tradeQty} shares of ${tradeSymbol}`
+    );
     setTradeQty(1);
   };
 
+  // ---------------------------
+  // Safely handle NaN before rendering
+  // ---------------------------
+  const safeSummary = {
+    totalAssets: isNaN(summary.totalAssets) ? 0 : summary.totalAssets,
+    dailyChange: isNaN(summary.dailyChange) ? 0 : summary.dailyChange,
+    cashBalance: isNaN(summary.cashBalance) ? 0 : summary.cashBalance,
+    totalGainLoss: isNaN(summary.totalGainLoss) ? 0 : summary.totalGainLoss,
+  };
+
+  // ---------------------------
+  // Render
+  // ---------------------------
   return (
     <div className="flex flex-col lg:flex-row min-h-screen bg-gray-50 antialiased">
       {/* Mobile Sidebar Toggle */}
       <div className="lg:hidden flex items-center justify-between bg-indigo-600 text-white p-4 shadow-md">
         <h1 className="text-lg font-semibold">EnergyVest Dashboard</h1>
-        <button onClick={toggleSidebar} className="text-white focus:outline-none">
+        <button
+          onClick={toggleSidebar}
+          className="text-white focus:outline-none"
+        >
           {sidebarOpen ? <X size={28} /> : <Menu size={28} />}
         </button>
       </div>
@@ -146,7 +151,7 @@ export default function DashboardPage() {
         <Sidebar onClose={toggleSidebar} />
       </div>
 
-      {/* Overlay for mobile */}
+      {/* Overlay */}
       {sidebarOpen && (
         <div
           className="fixed inset-0 bg-black/50 lg:hidden z-30"
@@ -156,7 +161,11 @@ export default function DashboardPage() {
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        <Header toggleProfile={toggleProfile} userName={userName} userTier={userTier} />
+        <Header
+          toggleProfile={toggleProfile}
+          userName={userName}
+          userTier={userTier}
+        />
 
         <main className="flex-1 overflow-y-auto bg-gray-100 p-4 md:p-8 space-y-8">
           {/* Profile Settings */}
@@ -169,31 +178,33 @@ export default function DashboardPage() {
             />
           )}
 
-          {/* ✅ Stat Cards */}
+          {/* Stat Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
             <StatCard
               title="Total Managed Assets"
-              value={`$${summary.totalAssets.toLocaleString() || "0.00"}`}
+              value={safeSummary.totalAssets} // ✅ Pass as number
               icon={Wallet}
-              change={summary.totalGainLoss}
+              change={safeSummary.totalGainLoss}
             />
+
             <StatCard
               title="24h Market Change"
-              value={`${!isNaN(summary.dailyChange) ? summary.dailyChange : 0}%`}
+              value={safeSummary.dailyChange} // ✅ Number
               icon={TrendingUp}
-              change={summary.dailyChange}
+              change={safeSummary.dailyChange}
             />
+
             <StatCard
               title="Available Cash Balance"
-              value={`$${summary.cashBalance.toLocaleString() || "0.00"}`}
+              value={safeSummary.cashBalance} // ✅ Number
               icon={DollarSign}
-              change={0}
             />
+
             <StatCard
               title="Total P&L (All Time)"
-              value={`$${summary.totalGainLoss.toLocaleString() || "0.00"}`}
+              value={safeSummary.totalGainLoss} // ✅ Number
               icon={FileText}
-              change={summary.totalGainLoss}
+              change={safeSummary.totalGainLoss}
             />
           </div>
 

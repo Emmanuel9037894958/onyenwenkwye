@@ -51,7 +51,7 @@ export default function TradingViewChart({ symbol }) {
     <div
       id="tradingview_chart"
       ref={container}
-      className="w-full h-[500px] rounded-lg shadow-md"
+      className="w-full h-[500px] rounded-lg shadow-md object-cover"
     />
   );
 }

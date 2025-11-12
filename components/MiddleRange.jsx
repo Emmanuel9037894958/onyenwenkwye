@@ -43,35 +43,36 @@ function MiddleRange() {
       </div>
 
       {/* ===== Right Section (Video) ===== */}
-      <div className="relative rounded-lg overflow-hidden shadow-lg">
-        {/* Overlay Text */}
-        <h3
-          className="
-            absolute top-3 sm:top-6 left-2 sm:left-4 
-            text-white font-semibold 
-            text-xs sm:text-sm md:text-lg 
-            drop-shadow-lg max-w-[85%]
-          "
-        >
-          Financial freedom is our success.
-        </h3>
+      <div className="relative"> {/* Ensure the parent container is set to 'relative' */}
+    <h3
+        className="
+            absolute 
+            top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 {/* CENTERING TRICK */}
+            text-white font-extrabold 
+            text-lg sm:text-2xl md:text-4xl lg:text-5xl {/* Increased text size for impact */}
+            drop-shadow-2xl max-w-[90%] text-center
+            
+        "
+    >
+        Financial freedom is our success.
+    </h3>
 
-        {/* Video */}
-        <video
-          src="/woman.mp4"
-          loop
-          muted
-          autoPlay
-          playsInline
-          className="
+    {/* Video */}
+    <video
+        src="/woman.mp4"
+        loop
+        muted
+        autoPlay
+        playsInline
+        className="
             w-full 
             h-[180px] sm:h-[260px] md:h-[340px] lg:h-[420px] 
             object-cover
-          "
-        >
-          <source src="/woman.mp4" type="video/mp4" />
-        </video>
-      </div>
+        "
+    >
+        <source src="/woman.mp4" type="video/mp4" />
+    </video>
+</div>
     </section>
   );
 }

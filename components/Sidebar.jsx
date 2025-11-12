@@ -7,7 +7,7 @@ const navItems = [
   { name: 'Trade Execution', href: '/dashboard/trade', icon: DollarSign },
   { name: 'Financial Reports', href: '/dashboard/reports', icon: FileText },
   { name: 'Client Records (CRM)', href: '/dashboard/clients', icon: Users, admin: true },
-  { name: 'Account Settings', href: '/dashboard/settings', icon: Settings },
+  { name: 'Account Settings', href: 'dashboard/settings', icon: Settings },
 ];
 
 export const Sidebar = () => {

@@ -9,3 +9,8 @@
 .animate-spin-slow {
   animation: spin-slow 6s linear infinite;
 }
+
+.swiper {
+  width: 100%;
+  height: auto; /* or fixed height like 400px */
+}

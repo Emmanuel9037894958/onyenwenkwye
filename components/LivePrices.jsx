@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react"
 
 export default function LivePrices() {
   const [prices, setPrices] = useState([]);
@@ -37,7 +37,7 @@ export default function LivePrices() {
   }, []);
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 text-white">
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-7 text-white xl: ml-4">
       {loading ? (
         <p className="col-span-full text-center text-gray-400">
           Loading prices...
@@ -69,5 +69,5 @@ export default function LivePrices() {
         </p>
       )}
     </div>
-  );
-}
+  )
+};
