@@ -14,3 +14,19 @@
   width: 100%;
   height: auto; /* or fixed height like 400px */
 }
+
+/* Hide the Google Translate default banner */
+.goog-te-banner-frame.skiptranslate {
+    display: none !important;
+}
+
+/* Prevent the iframe from moving the page content */
+body {
+    top: 0 !important;
+}
+
+/* Hide the Google Translate dropdown in iframe if injected */
+#google_translate_element {
+    display: none !important;
+}
+
